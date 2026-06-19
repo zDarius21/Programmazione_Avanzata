@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import ResponseFactory from '../utils/responseFactory';
 
-const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY!.replace(/\\n/g, '\n');
+const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY!.replaceAll(String.raw`\n`, '\n');
 const JWT_EXPIRY = '1h';
 
 export const register = async (req: Request, res: Response): Promise<void> => {

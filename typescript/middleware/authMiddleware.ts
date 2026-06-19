@@ -19,13 +19,13 @@ declare global {
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith('Bearer ')) {
     ResponseFactory.error(res, 'Token mancante', 401);
     return;
   }
 
   const token = authHeader.split(' ')[1];
-  const publicKey = process.env.JWT_PUBLIC_KEY!.replace(/\\n/g, '\n');
+  const publicKey = process.env.JWT_PUBLIC_KEY!.replaceAll(String.raw`\n`, '\n');
 
   try {
     req.user = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as AuthPayload;
