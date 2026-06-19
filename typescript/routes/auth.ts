@@ -3,6 +3,7 @@ import { register, login } from '../controllers/authController';
 
 const router = Router();
 
+// Rotte pubbliche — non richiedono autenticazione
 router.post('/register', register);
 router.post('/login', login);
 

@@ -1,9 +1,11 @@
 import { Sequelize } from 'sequelize';
 
+// Pattern Singleton: garantisce un'unica connessione al database
 class Database {
   private static instance: Sequelize;
 
   static getInstance(): Sequelize {
+    // Crea la connessione solo la prima volta che viene richiesta
     if (!Database.instance) {
       Database.instance = new Sequelize({
         dialect: 'postgres',

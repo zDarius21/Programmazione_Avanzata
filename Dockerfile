@@ -2,7 +2,7 @@
 FROM node:20-alpine
 
 # Directory di lavoro all'interno del container dove verranno copiati i file dell'applicazione
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copia i file di configurazione delle dipendenze e installa i pacchetti Node.js
 COPY package*.json ./

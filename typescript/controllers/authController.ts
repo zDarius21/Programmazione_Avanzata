@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
+import fs from 'node:fs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import ResponseFactory from '../utils/responseFactory';
 
-const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY!.replaceAll(String.raw`\n`, '\n');
-const JWT_EXPIRY = '1h';
+// La chiave privata letta dal file indicato nel .env 
+const PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_PATH!, 'utf8');
+const JWT_EXPIRY = (process.env.JWT_EXPIRES_IN ?? '1h') as jwt.SignOptions['expiresIn'];
 
+// Registra un nuovo utente, salva la password hashata e restituisce un token JWT
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { email, password, role } = req.body;
 
@@ -15,6 +18,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  // Controlliamo che l'email non sia già in uso
   const existing = await User.findOne({ where: { email } });
   if (existing) {
     ResponseFactory.error(res, 'Email già registrata', 409);
@@ -32,6 +36,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   ResponseFactory.success(res, { token }, 201);
 };
 
+// Verifica le credenziali e restituisce un token JWT se corrette
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -46,6 +51,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  // Confrontiamo la password inviata con quella hashata nel database
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
     ResponseFactory.error(res, 'Credenziali non valide', 401);

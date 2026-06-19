@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import Database from '../config/database';
 
+// Attributi completi di un utente
 interface UserAttributes {
   id: number;
   email: string;
@@ -8,6 +9,7 @@ interface UserAttributes {
   role: 'user' | 'admin';
 }
 
+// In fase di creazione l'id è opzionale perché lo genera il database
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
@@ -17,6 +19,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   declare role: 'user' | 'admin';
 }
 
+// Definizione della tabella e dei tipi delle colonne
 User.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
