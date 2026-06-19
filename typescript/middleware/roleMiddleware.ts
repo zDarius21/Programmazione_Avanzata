@@ -1,0 +1,10 @@
+import { Request, Response, NextFunction } from 'express';
+import ResponseFactory from '../utils/responseFactory';
+
+export const requireAdmin = (req: Request, res: Response, next: NextFunction): void => {
+  if (req.user?.role !== 'admin') {
+    ResponseFactory.error(res, 'Accesso riservato agli admin', 403);
+    return;
+  }
+  next();
+};
