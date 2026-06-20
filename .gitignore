@@ -10,3 +10,7 @@
 /keys/*.pem
 
 /dist
+
+/postman/collections
+
+/postman/environments
