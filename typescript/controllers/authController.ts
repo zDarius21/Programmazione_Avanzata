@@ -33,7 +33,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     expiresIn: JWT_EXPIRY,
   });
 
-  ResponseFactory.success(res, { token }, 201);
+  ResponseFactory.success(res, { token, role: user.role }, 201);
 };
 
 // Verifica le credenziali e restituisce un token JWT se corrette
@@ -63,5 +63,5 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     expiresIn: JWT_EXPIRY,
   });
 
-  ResponseFactory.success(res, { token });
+  ResponseFactory.success(res, { token, role: user.role });
 };

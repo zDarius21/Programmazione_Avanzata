@@ -4,6 +4,7 @@ import Database from './config/database';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import regulationRoutes from './routes/regulations';
+import documentRoutes from './routes/documents';
 
 // Carica le variabili d'ambiente dal file .env
 dotenv.config();
@@ -21,6 +22,7 @@ app.use('/regulations', regulationRoutes);
 
 // Rotte utenti (solo admin)
 app.use('/users', userRoutes);
+app.use('/documents', documentRoutes);
 
 // Prima di avviare il server verifichiamo la connessione e sincronizziamo i modelli con il database
 Database.getInstance()

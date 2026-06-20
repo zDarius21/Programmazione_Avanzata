@@ -137,6 +137,9 @@
                       "  const body = pm.response.json();",
                       "  pm.expect(body.success).to.be.true;",
                       "  pm.expect(body.data.token).to.be.a('string');",
+                      "  if (body.data.role === 'admin') {",
+                      "    pm.environment.set('ADMIN_TOKEN', body.data.token);",
+                      "  }",
                       "  pm.environment.set('JWT_TOKEN', body.data.token);",
                       "});"
                     ],
@@ -1419,6 +1422,510 @@
                   "host": ["{{HOST}}"],
                   "port": "{{PORT}}",
                   "path": ["regulations", "{{REGULATION_ID}}"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "GetAllDocuments",
+          "item": [
+            {
+              "name": "GetAllDocumentsSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('success true e data array', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data).to.be.an('array');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents"]
+                }
+              }
+            },
+            {
+              "name": "GetAllDocumentsNoToken",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "CreateDocument",
+          "item": [
+            {
+              "name": "CreateDocumentSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 201', () => pm.response.to.have.status(201));",
+                      "pm.test('documento creato', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.id).to.be.a('number');",
+                      "  pm.expect(body.data.status).to.equal('pending');",
+                      "  pm.environment.set('DOCUMENT_ID', body.data.id);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Documento di test\",\n  \"description\": \"Descrizione del documento di test\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents"]
+                }
+              }
+            },
+            {
+              "name": "CreateDocumentMissingFields",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Solo titolo\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents"]
+                }
+              }
+            },
+            {
+              "name": "CreateDocumentNoToken",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Documento\",\n  \"description\": \"Descrizione\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GetDocumentById",
+          "item": [
+            {
+              "name": "GetDocumentByIdSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('documento restituito', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.id).to.be.a('number');",
+                      "  pm.expect(body.data.title).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/{{DOCUMENT_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "{{DOCUMENT_ID}}"]
+                }
+              }
+            },
+            {
+              "name": "GetDocumentByIdNotFound",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/99999",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "99999"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "UpdateDocument",
+          "item": [
+            {
+              "name": "UpdateDocumentSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('documento aggiornato', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.title).to.equal('Titolo aggiornato');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Titolo aggiornato\",\n  \"description\": \"Descrizione aggiornata\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/{{DOCUMENT_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "{{DOCUMENT_ID}}"]
+                }
+              }
+            },
+            {
+              "name": "UpdateDocumentNotFound",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Titolo\",\n  \"description\": \"Descrizione\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/99999",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "99999"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "AnalyzeDocument",
+          "item": [
+            {
+              "name": "AnalyzeDocumentSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('status diventa analyzed', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.status).to.equal('analyzed');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/{{DOCUMENT_ID}}/analyze",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "{{DOCUMENT_ID}}", "analyze"]
+                }
+              }
+            },
+            {
+              "name": "AnalyzeDocumentAlreadyAnalyzed",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 409', () => pm.response.to.have.status(409));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/{{DOCUMENT_ID}}/analyze",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "{{DOCUMENT_ID}}", "analyze"]
+                }
+              }
+            },
+            {
+              "name": "AnalyzeDocumentNotFound",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/99999/analyze",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "99999", "analyze"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "DeleteDocument",
+          "item": [
+            {
+              "name": "DeleteDocumentSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('documento eliminato', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.message).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/{{DOCUMENT_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "{{DOCUMENT_ID}}"]
+                }
+              }
+            },
+            {
+              "name": "DeleteDocumentNotFound",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/99999",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "99999"]
                 }
               }
             }
