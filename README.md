@@ -18,66 +18,64 @@ Le operazioni principali sono:
 
 Le **rotte di autenticazione** permettono all'utente di registrarsi e di effettuare il login.
 
-| METODO | ROTTA | JWT RICHIESTO |
-|--------|-------|---------------|
-| POST | /auth/register | No |
-| POST | /auth/login | No |
+| METODO | ROTTA | JWT RICHIESTO | DESCRIZIONE |
+|--------|-------|---------------|-------------|
+| POST | /auth/register | No | Registra un nuovo utente e restituisce un token JWT |
+| POST | /auth/login | No | Verifica le credenziali e restituisce un token JWT |
 
 ### Utenti 
 
 Le **rotte relative agli utenti** permettono all'**admin** di effettuare operazioni **CRUD** relativamente alle informazioni degli utenti.
 
-| METODO | ROTTA | JWT RICHIESTO |
-|--------|-------|---------------|
-| GET | /users | Sì (admin) |
-| GET | /users/:id | Sì (admin) |
-| POST | /users | Sì (admin) |
-| PUT | /users/:id | Sì (admin) |
-| DELETE | /users/:id | Sì (admin) |
+| METODO | ROTTA | JWT RICHIESTO | DESCRIZIONE |
+|--------|-------|---------------|-------------|
+| GET | /users | Sì (admin) | Restituisce la lista di tutti gli utenti |
+| GET | /users/:id | Sì (admin) | Restituisce i dati di un singolo utente |
+| POST | /users | Sì (admin) | Crea un nuovo utente |
+| PUT | /users/:id | Sì (admin) | Modifica i dati di un utente esistente |
+| DELETE | /users/:id | Sì (admin) | Elimina un utente |
 
 ### Normative
 
 Le **rotte delle normative** permettono agli utenti di ottenere la lista delle normative e all'admin di poter modificare quest'ultima.
 
-| METODO | ROTTA | JWT RICHIESTO |
-|--------|-------|---------------|
-| GET | /regulations | Sì |
-| GET | /regulations/:id | Sì |
-| POST | /regulations | Sì (admin) |
-| PUT | /regulations/:id | Sì (admin) |
-| DELETE | /regulations/:id | Sì (admin) |
+| METODO | ROTTA | JWT RICHIESTO | DESCRIZIONE |
+|--------|-------|---------------|-------------|
+| GET | /regulations | Sì | Restituisce la lista di tutte le normative |
+| GET | /regulations/:id | Sì | Restituisce i dettagli di una singola normativa |
+| POST | /regulations | Sì (admin) | Aggiunge una nuova normativa al catalogo |
+| PUT | /regulations/:id | Sì (admin) | Modifica una normativa esistente |
+| DELETE | /regulations/:id | Sì (admin) | Elimina una normativa dal catalogo |
 
 ### Documenti
 
 Le **rotte dei documenti** permettono agli utenti di ottenere ed inviare nuovi documenti per l'analisi.
 
-| METODO | ROTTA | JWT RICHIESTO |
-|--------|-------|---------------|
-| GET | /documents | Sì |
-| GET | /documents/:id | Sì |
-| POST | /documents | Sì |
-| PUT | /documents/:id | Sì |
-| DELETE | /documents/:id | Sì |
-| POST | /documents/:id/analyze | Sì |
-
-
+| METODO | ROTTA | JWT RICHIESTO | DESCRIZIONE |
+|--------|-------|---------------|-------------|
+| GET | /documents | Sì | Restituisce la lista dei documenti dell'utente |
+| GET | /documents/:id | Sì | Restituisce i dettagli di un singolo documento |
+| POST | /documents | Sì | Carica i metadati di un nuovo documento |
+| PUT | /documents/:id | Sì | Modifica i metadati di un documento esistente |
+| DELETE | /documents/:id | Sì | Elimina un documento |
+| POST | /documents/:id/analyze | Sì | Avvia l'analisi di conformità su un documento |
 
 ### Analisi
 
 Le **rotte dell'analisi** permettono agli utenti di recuperare le analisi effettuate in passato.
 
-| METODO | ROTTA | JWT RICHIESTO |
-|--------|-------|---------------|
-| GET | /analyses | Sì |
-| GET | /analyses/:id | Sì |
+| METODO | ROTTA | JWT RICHIESTO | DESCRIZIONE |
+|--------|-------|---------------|-------------|
+| GET | /analyses | Sì | Restituisce la lista di tutte le analisi dell'utente |
+| GET | /analyses/:id | Sì | Restituisce i dettagli e i risultati di una singola analisi |
 
 ### Report
 
 Le **rotte dei report** permettono agli utenti di recuperare i report generati in passato.
 
-| METODO | ROTTA | JWT RICHIESTO |
-|--------|-------|---------------|
-| GET | /reports/:id | Sì |
+| METODO | ROTTA | JWT RICHIESTO | DESCRIZIONE |
+|--------|-------|---------------|-------------|
+| GET | /reports/:id | Sì | Restituisce il report generato da un'analisi |
 
 ## Design Pattern Implementati
 

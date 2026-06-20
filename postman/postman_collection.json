@@ -920,6 +920,511 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Regulations",
+      "item": [
+        {
+          "name": "GET /regulations",
+          "item": [
+            {
+              "name": "GetAllRegulationsSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('success true e data è un array', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data).to.be.an('array');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations"]
+                }
+              }
+            },
+            {
+              "name": "GetAllRegulationsUnauthorized",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 401 senza token', () => pm.response.to.have.status(401));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /regulations",
+          "item": [
+            {
+              "name": "CreateRegulationSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 201', () => pm.response.to.have.status(201));",
+                      "pm.test('normativa creata e id salvato', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.id).to.be.a('number');",
+                      "  pm.expect(body.data.name).to.be.a('string');",
+                      "  pm.environment.set('REGULATION_ID', body.data.id);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"Corporate Sustainability Reporting Directive\",\n  \"version\": \"1.0\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations"]
+                }
+              }
+            },
+            {
+              "name": "CreateRegulationMissingFields",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CSRD\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations"]
+                }
+              }
+            },
+            {
+              "name": "CreateRegulationDuplicate",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 409', () => pm.response.to.have.status(409));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"Corporate Sustainability Reporting Directive\",\n  \"version\": \"1.0\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations"]
+                }
+              }
+            },
+            {
+              "name": "CreateRegulationForbiddenUser",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 403 se non admin', () => pm.response.to.have.status(403));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"GRI\",\n  \"description\": \"Global Reporting Initiative\",\n  \"version\": \"2.0\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /regulations/:id",
+          "item": [
+            {
+              "name": "GetRegulationByIdSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('normativa corretta restituita', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.id).to.eql(parseInt(pm.environment.get('REGULATION_ID')));",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations/{{REGULATION_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations", "{{REGULATION_ID}}"]
+                }
+              }
+            },
+            {
+              "name": "GetRegulationByIdNotFound",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations/99999",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations", "99999"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /regulations/:id",
+          "item": [
+            {
+              "name": "UpdateRegulationSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('normativa aggiornata', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.version).to.eql('2.0');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"Corporate Sustainability Reporting Directive aggiornata\",\n  \"version\": \"2.0\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations/{{REGULATION_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations", "{{REGULATION_ID}}"]
+                }
+              }
+            },
+            {
+              "name": "UpdateRegulationNotFound",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"desc\",\n  \"version\": \"2.0\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations/99999",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations", "99999"]
+                }
+              }
+            },
+            {
+              "name": "UpdateRegulationForbiddenUser",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 403 se non admin', () => pm.response.to.have.status(403));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"desc\",\n  \"version\": \"2.0\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations/{{REGULATION_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations", "{{REGULATION_ID}}"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /regulations/:id",
+          "item": [
+            {
+              "name": "DeleteRegulationForbiddenUser",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 403 se non admin', () => pm.response.to.have.status(403));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations/{{REGULATION_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations", "{{REGULATION_ID}}"]
+                }
+              }
+            },
+            {
+              "name": "DeleteRegulationNotFound",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations/99999",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations", "99999"]
+                }
+              }
+            },
+            {
+              "name": "DeleteRegulationSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('normativa eliminata', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.message).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/regulations/{{REGULATION_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["regulations", "{{REGULATION_ID}}"]
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import Database from './config/database';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
+import regulationRoutes from './routes/regulations';
 
 // Carica le variabili d'ambiente dal file .env
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // Rotte di autenticazione
 app.use('/auth', authRoutes);
+app.use('/regulations', regulationRoutes);
 
 // Rotte utenti (solo admin)
 app.use('/users', userRoutes);
