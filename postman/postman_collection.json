@@ -9,222 +9,232 @@
       "name": "Auth",
       "item": [
         {
-          "name": "RegisterSuccess",
-          "event": [
+          "name": "Register",
+          "item": [
             {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code 201', () => pm.response.to.have.status(201));",
-                  "pm.test('success true', () => {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body.success).to.be.true;",
-                  "  pm.expect(body.data.token).to.be.a('string');",
-                  "  pm.environment.set('JWT_TOKEN', body.data.token);",
-                  "});"
+              "name": "RegisterSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 201', () => pm.response.to.have.status(201));",
+                      "pm.test('success true', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.token).to.be.a('string');",
+                      "  pm.environment.set('JWT_TOKEN', body.data.token);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
                 ],
-                "type": "text/javascript"
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"Password123!\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/auth/register",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["auth", "register"]
+                }
+              }
+            },
+            {
+              "name": "RegisterMissingFields",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"utente@test.com\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/auth/register",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["auth", "register"]
+                }
+              }
+            },
+            {
+              "name": "RegisterDuplicateEmail",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 409', () => pm.response.to.have.status(409));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"Password123!\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/auth/register",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["auth", "register"]
+                }
               }
             }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"Password123!\"\n}"
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/auth/register",
-              "protocol": "http",
-              "host": ["{{HOST}}"],
-              "port": "{{PORT}}",
-              "path": ["auth", "register"]
-            }
-          }
+          ]
         },
         {
-          "name": "RegisterMissingFields",
-          "event": [
+          "name": "Login",
+          "item": [
             {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code 400', () => pm.response.to.have.status(400));",
-                  "pm.test('success false', () => {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body.success).to.be.false;",
-                  "  pm.expect(body.error).to.be.a('string');",
-                  "});"
+              "name": "LoginSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('success true e token presente', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.token).to.be.a('string');",
+                      "  pm.environment.set('JWT_TOKEN', body.data.token);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
                 ],
-                "type": "text/javascript"
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"Password123!\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/auth/login",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["auth", "login"]
+                }
+              }
+            },
+            {
+              "name": "LoginMissingFields",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"utente@test.com\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/auth/login",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["auth", "login"]
+                }
+              }
+            },
+            {
+              "name": "LoginInvalidCredentials",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"WrongPassword!\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/auth/login",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["auth", "login"]
+                }
               }
             }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"utente@test.com\"\n}"
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/auth/register",
-              "protocol": "http",
-              "host": ["{{HOST}}"],
-              "port": "{{PORT}}",
-              "path": ["auth", "register"]
-            }
-          }
-        },
-        {
-          "name": "RegisterDuplicateEmail",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code 409', () => pm.response.to.have.status(409));",
-                  "pm.test('success false', () => {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body.success).to.be.false;",
-                  "  pm.expect(body.error).to.be.a('string');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"Password123!\"\n}"
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/auth/register",
-              "protocol": "http",
-              "host": ["{{HOST}}"],
-              "port": "{{PORT}}",
-              "path": ["auth", "register"]
-            }
-          }
-        },
-        {
-          "name": "LoginSuccess",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code 200', () => pm.response.to.have.status(200));",
-                  "pm.test('success true e token presente', () => {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body.success).to.be.true;",
-                  "  pm.expect(body.data.token).to.be.a('string');",
-                  "  pm.environment.set('JWT_TOKEN', body.data.token);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"Password123!\"\n}"
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/auth/login",
-              "protocol": "http",
-              "host": ["{{HOST}}"],
-              "port": "{{PORT}}",
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "LoginMissingFields",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code 400', () => pm.response.to.have.status(400));",
-                  "pm.test('success false', () => {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body.success).to.be.false;",
-                  "  pm.expect(body.error).to.be.a('string');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"utente@test.com\"\n}"
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/auth/login",
-              "protocol": "http",
-              "host": ["{{HOST}}"],
-              "port": "{{PORT}}",
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "LoginInvalidCredentials",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                  "pm.test('success false', () => {",
-                  "  const body = pm.response.json();",
-                  "  pm.expect(body.success).to.be.false;",
-                  "  pm.expect(body.error).to.be.a('string');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"passwordsbagliata\"\n}"
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/auth/login",
-              "protocol": "http",
-              "host": ["{{HOST}}"],
-              "port": "{{PORT}}",
-              "path": ["auth", "login"]
-            }
-          }
+          ]
         }
       ]
     }

@@ -9,7 +9,7 @@ interface UserAttributes {
   role: 'user' | 'admin';
 }
 
-// In fase di creazione l'id è opzionale perché lo genera il database
+// In fase di creazione l'id è opzionale perché lo genera incrementalmente il database
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {

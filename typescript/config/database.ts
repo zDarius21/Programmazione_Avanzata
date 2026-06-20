@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-// Pattern Singleton: garantisce un'unica connessione al database
+// Pattern Singleton che garantisce un'unica connessione al database
 class Database {
   private static instance: Sequelize;
 

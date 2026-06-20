@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Rimuove l'header X-Powered-By per non esporre la tecnologia usata
+// Rimuove l'header X-Powered-By 
 app.disable('x-powered-by');
 app.use(express.json());
 
