@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import ResponseFactory from '../utils/responseFactory';
 
 // La chiave pubblica viene usata per verificare la firma dei token in entrata
-const PUBLIC_KEY = fs.readFileSync(process.env.JWT_PUBLIC_KEY_PATH!, 'utf8');
+const PUBLIC_KEY = fs.readFileSync(process.env.JWT_PUBLIC_KEY_PATH ?? '', 'utf8');
 
 // Struttura del payload decodificato dal token JWT
 export interface AuthPayload {

@@ -6,7 +6,7 @@ import User from '../models/User';
 import ResponseFactory from '../utils/responseFactory';
 
 // La chiave privata letta dal file indicato nel .env 
-const PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_PATH!, 'utf8');
+const PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_PATH ?? '', 'utf8');
 const JWT_EXPIRY = (process.env.JWT_EXPIRES_IN ?? '1h') as jwt.SignOptions['expiresIn'];
 
 // Registra un nuovo utente, salva la password hashata e restituisce un token JWT
