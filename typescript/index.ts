@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import Database from './config/database';
 import authRoutes from './routes/auth';
+import userRoutes from './routes/users';
 
 // Carica le variabili d'ambiente dal file .env
 dotenv.config();
@@ -9,12 +10,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Rimuove l'header X-Powered-By 
+// Rimuove l'header X-Powered-By
 app.disable('x-powered-by');
 app.use(express.json());
 
 // Rotte di autenticazione
 app.use('/auth', authRoutes);
+
+// Rotte utenti (solo admin)
+app.use('/users', userRoutes);
 
 // Prima di avviare il server verifichiamo la connessione e sincronizziamo i modelli con il database
 Database.getInstance()
