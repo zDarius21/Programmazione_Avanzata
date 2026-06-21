@@ -11,7 +11,7 @@ import {
 
 const router = Router();
 
-// Tutte le rotte /documents richiedono un token JWT valido
+// Tutte le rotte /documents che permettono di effettuare operazioni CRUD, dopo aver verificato l'autenticazione tramite il token JWT.
 router.use(authenticate);
 
 router.get('/', getAllDocuments);

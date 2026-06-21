@@ -5,11 +5,11 @@ import { requireAdmin } from '../middleware/roleMiddleware';
 
 const router = Router();
 
-// Rotte accessibili a tutti gli utenti autenticati
+// Rotte accessibili a tutti gli utenti autenticati per operazioni di lettura
 router.get('/', authenticate, getAllRegulations);
 router.get('/:id', authenticate, getRegulationById);
 
-// Rotte riservate agli admin — il token viene verificato e il ruolo controllato
+// Rotte riservate agli admin per operazioni CUD
 router.post('/', authenticate, requireAdmin, createRegulation);
 router.put('/:id', authenticate, requireAdmin, updateRegulation);
 router.delete('/:id', authenticate, requireAdmin, deleteRegulation);

@@ -6,7 +6,7 @@ INSERT INTO public.users (email, password, role, "createdAt", "updatedAt") VALUE
 ('andrea@example.com', '$2a$12$GC7DWWoNovTD7.dq3vmjrefLPtwacpWtd33qPW7Bc3t9F9uhFmjvC', 'user',  NOW(), NOW())  -- password: Andrea+123
 ON CONFLICT (email) DO NOTHING;
 
--- Popolamento della tabella "regulations" con le 10 normative ESG supportate dalla piattaforma.
+-- Popolamento della tabella "regulations" con le 10 normative ESG utilizzate nell'analisi dei documenti caricati dagli utenti.
 
 INSERT INTO public.regulations (name, description, version, "createdAt", "updatedAt") VALUES
 (
@@ -71,7 +71,7 @@ INSERT INTO public.regulations (name, description, version, "createdAt", "update
 )
 ON CONFLICT (name) DO NOTHING;
 
--- Popolamento della tabella "documents" con documenti di esempio caricati dagli utenti (dario id=2, andrea id=3).
+-- Popolamento della tabella "documents" con documenti caricati dagli utenti.
 
 INSERT INTO public.documents ("userId", title, description, status, "createdAt", "updatedAt") VALUES
 (
