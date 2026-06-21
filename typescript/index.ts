@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import Database from './config/database';
+import Database from './singleton/database';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import regulationRoutes from './routes/regulations';

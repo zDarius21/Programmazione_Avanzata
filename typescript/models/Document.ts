@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import Database from '../config/database';
+import Database from '../singleton/database';
 
 // Stati possibili di un documento: in attesa di analisi o già analizzato
 type DocumentStatus = 'pending' | 'analyzed';

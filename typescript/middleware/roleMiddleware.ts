@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import ResponseFactory from '../utils/responseFactory';
+import ResponseFactory from '../factory/responseFactory';
 
 // Middleware che blocca l'accesso se l'utente non ha il ruolo admin
 export const requireAdmin = (req: Request, res: Response, next: NextFunction): void => {

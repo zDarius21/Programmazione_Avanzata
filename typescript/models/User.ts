@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import Database from '../config/database';
+import Database from '../singleton/database';
 
 // Attributi completi di un utente
 interface UserAttributes {

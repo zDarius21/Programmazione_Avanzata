@@ -3,9 +3,9 @@ import fs from 'node:fs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
-import ResponseFactory from '../utils/responseFactory';
+import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 
-// La chiave privata letta dal file indicato nel .env 
+// La chiave privata letta dal file indicato nel .env
 const PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_PATH ?? '', 'utf8');
 const JWT_EXPIRY = (process.env.JWT_EXPIRES_IN ?? '1h') as jwt.SignOptions['expiresIn'];
 
@@ -14,14 +14,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   const { email, password, role } = req.body;
 
   if (!email || !password) {
-    ResponseFactory.error(res, 'Email e password obbligatori', 400);
+    ResponseFactory.sendError(res, ErrorEnum.MissingEmailPassword);
     return;
   }
 
   // Controlliamo che l'email non sia già in uso
   const existing = await User.findOne({ where: { email } });
   if (existing) {
-    ResponseFactory.error(res, 'Email già registrata', 409);
+    ResponseFactory.sendError(res, ErrorEnum.EmailAlreadyRegistered);
     return;
   }
 
@@ -33,7 +33,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     expiresIn: JWT_EXPIRY,
   });
 
-  ResponseFactory.success(res, { token, role: user.role }, 201);
+  ResponseFactory.sendSuccess(res, SuccessEnum.UserRegistered, { token, role: user.role });
 };
 
 // Verifica le credenziali e restituisce un token JWT se corrette
@@ -41,20 +41,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    ResponseFactory.error(res, 'Email e password obbligatori', 400);
+    ResponseFactory.sendError(res, ErrorEnum.MissingEmailPassword);
     return;
   }
 
   const user = await User.findOne({ where: { email } });
   if (!user) {
-    ResponseFactory.error(res, 'Credenziali non valide', 401);
+    ResponseFactory.sendError(res, ErrorEnum.InvalidCredentials);
     return;
   }
 
   // Confrontiamo la password inviata con quella hashata nel database
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
-    ResponseFactory.error(res, 'Credenziali non valide', 401);
+    ResponseFactory.sendError(res, ErrorEnum.InvalidCredentials);
     return;
   }
 
@@ -63,5 +63,5 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     expiresIn: JWT_EXPIRY,
   });
 
-  ResponseFactory.success(res, { token, role: user.role });
+  ResponseFactory.sendSuccess(res, SuccessEnum.UserLoggedIn, { token, role: user.role });
 };
