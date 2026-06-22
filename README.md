@@ -32,7 +32,7 @@ Le **rotte relative agli utenti** permettono all'**admin** di effettuare operazi
 | `GET` | /users | Sì (admin) | Restituisce la lista di tutti gli utenti |
 | `GET` | /users/:id | Sì (admin) | Restituisce i dati di un singolo utente |
 | `POST` | /users | Sì (admin) | Crea un nuovo utente |
-| `PUT` | /users/:id | Sì (admin) | Modifica i dati di un utente esistente |
+| `PATCH` | /users/:id | Sì (admin) | Modifica i dati di un utente esistente |
 | `DELETE` | /users/:id | Sì (admin) | Elimina un utente |
 
 ### Normative
@@ -44,7 +44,7 @@ Le **rotte delle normative** permettono agli utenti di ottenere la lista delle n
 | `GET` | /regulations | Sì | Restituisce la lista di tutte le normative |
 | `GET` | /regulations/:id | Sì | Restituisce i dettagli di una singola normativa |
 | `POST` | /regulations | Sì (admin) | Aggiunge una nuova normativa al catalogo |
-| `PUT` | /regulations/:id | Sì (admin) | Modifica una normativa esistente |
+| `PATCH` | /regulations/:id | Sì (admin) | Modifica una normativa esistente |
 | `DELETE` | /regulations/:id | Sì (admin) | Elimina una normativa dal catalogo |
 
 ### Documenti
@@ -56,7 +56,7 @@ Le **rotte dei documenti** permettono agli utenti di ottenere ed inviare nuovi d
 | `GET` | /documents | Sì | Restituisce la lista dei documenti dell'utente |
 | `GET` | /documents/:id | Sì | Restituisce i dettagli di un singolo documento |
 | `POST` | /documents | Sì | Carica i metadati di un nuovo documento |
-| `PUT` | /documents/:id | Sì | Modifica i metadati di un documento esistente |
+| `PATCH` | /documents/:id | Sì | Modifica i metadati di un documento esistente |
 | `DELETE` | /documents/:id | Sì | Elimina un documento |
 | `POST` | /documents/:id/analyze | Sì | Avvia l'analisi di conformità su un documento |
 
