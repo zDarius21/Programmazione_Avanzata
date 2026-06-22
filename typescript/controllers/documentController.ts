@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import PDFDocument from 'pdfkit';
 import Document from '../models/Document';
+import Report from '../models/Report';
 import MinioStorage from '../singleton/minio';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 
@@ -188,13 +189,13 @@ function generateReport(docModel: Document): Promise<Buffer> {
 
 // Restituisce solo i documenti dell'utente autenticato
 export const getAllDocuments = async (req: Request, res: Response): Promise<void> => {
-  const documents = await Document.findAll({ where: { userId: req.user!.id } });
+  const documents = await Document.findAll({ where: { userId: req.user.id } });
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentsFetched, documents);
 };
 
 // Restituisce un singolo documento dell'utente autenticato
 export const getDocumentById = async (req: Request, res: Response): Promise<void> => {
-  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user!.id } });
+  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user.id } });
   if (!document) {
     ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
     return;
@@ -211,7 +212,7 @@ export const createDocument = async (req: Request, res: Response): Promise<void>
     return;
   }
 
-  const document = await Document.create({ userId: req.user!.id, title, description });
+  const document = await Document.create({ userId: req.user.id, title, description });
 
   if (req.file) {
     const fileKey = `documents/${document.id}/original.pdf`;
@@ -235,7 +236,7 @@ export const createDocument = async (req: Request, res: Response): Promise<void>
 
 // Aggiorna titolo o descrizione di un documento dell'utente autenticato
 export const updateDocument = async (req: Request, res: Response): Promise<void> => {
-  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user!.id } });
+  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user.id } });
   if (!document) {
     ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
     return;
@@ -248,7 +249,7 @@ export const updateDocument = async (req: Request, res: Response): Promise<void>
 
 // Elimina un documento e i rispettivi file su MinIO
 export const deleteDocument = async (req: Request, res: Response): Promise<void> => {
-  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user!.id } });
+  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user.id } });
   if (!document) {
     ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
     return;
@@ -264,7 +265,7 @@ export const deleteDocument = async (req: Request, res: Response): Promise<void>
 
 // Analizza il documento, generando un report PDF su MinIO e aggiornando lo stato
 export const analyzeDocument = async (req: Request, res: Response): Promise<void> => {
-  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user!.id } });
+  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user.id } });
   if (!document) {
     ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
     return;
@@ -285,12 +286,16 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
   }
 
   await document.update({ status: 'analyzed', reportPath: reportKey });
-  ResponseFactory.sendSuccess(res, SuccessEnum.DocumentAnalyzed, document);
+
+  // Crea il record del report nel DB con il proprio ID univoco
+  const report = await Report.create({ documentId: document.id, userId: req.user.id, filePath: reportKey });
+
+  ResponseFactory.sendSuccess(res, SuccessEnum.DocumentAnalyzed, { document, reportId: report.id });
 };
 
 // Scarica il report PDF del documento direttamente da MinIO 
 export const downloadReport = async (req: Request, res: Response): Promise<void> => {
-  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user!.id } });
+  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user.id } });
   if (!document) {
     ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
     return;

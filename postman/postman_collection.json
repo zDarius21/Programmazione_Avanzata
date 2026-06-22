@@ -821,6 +821,224 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Analyses",
+      "item": [
+        {
+          "name": "GET /analyses",
+          "item": [
+            {
+              "name": "GetAllAnalysesSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('success true e data è un array', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data).to.be.an('array');",
+                      "  if (body.data.length > 0) {",
+                      "    pm.expect(body.data[0].status).to.equal('analyzed');",
+                      "    pm.environment.set('ANALYSIS_ID', body.data[0].id);",
+                      "  }",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/analyses",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["analyses"]
+                }
+              }
+            },
+            {
+              "name": "GetAllAnalysesNoToken",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/analyses",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["analyses"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /analyses/:id",
+          "item": [
+            {
+              "name": "GetAnalysisByIdSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('analisi restituita con reportUrl', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.status).to.equal('analyzed');",
+                      "  pm.expect(body.data).to.have.property('reportUrl');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/analyses/{{ANALYSIS_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["analyses", "{{ANALYSIS_ID}}"]
+                }
+              }
+            },
+            {
+              "name": "GetAnalysisByIdNotFound",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/analyses/99999",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["analyses", "99999"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "GET /reports/:id",
+          "item": [
+            {
+              "name": "GetReportSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('risposta è un PDF', () => {",
+                      "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/reports/{{DOCUMENT_ID}}",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["reports", "{{DOCUMENT_ID}}"]
+                }
+              }
+            },
+            {
+              "name": "GetReportNotReady",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.be.a('string');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/reports/99999",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["reports", "99999"]
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
