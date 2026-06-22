@@ -764,8 +764,12 @@
                       "pm.test('status diventa analyzed', () => {",
                       "  const body = pm.response.json();",
                       "  pm.expect(body.success).to.be.true;",
-                      "  pm.expect(body.data.status).to.equal('analyzed');",
-                      "});"
+                      "  pm.expect(body.data.document.status).to.equal('analyzed');",
+                      "});",
+                      "const body = pm.response.json();",
+                      "if (body.data && body.data.reportId) {",
+                      "  pm.environment.set('REPORT_ID', body.data.reportId);",
+                      "}"
                     ],
                     "type": "text/javascript"
                   }
@@ -1000,11 +1004,11 @@
                   { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
                 ],
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/reports/{{DOCUMENT_ID}}",
+                  "raw": "http://{{HOST}}:{{PORT}}/reports/{{REPORT_ID}}",
                   "protocol": "http",
                   "host": ["{{HOST}}"],
                   "port": "{{PORT}}",
-                  "path": ["reports", "{{DOCUMENT_ID}}"]
+                  "path": ["reports", "{{REPORT_ID}}"]
                 }
               }
             },
