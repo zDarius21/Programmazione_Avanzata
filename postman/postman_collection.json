@@ -915,11 +915,10 @@
                   "script": {
                     "exec": [
                       "pm.test('Status code 200', () => pm.response.to.have.status(200));",
-                      "pm.test('analisi restituita con reportUrl', () => {",
+                      "pm.test('analisi restituita', () => {",
                       "  const body = pm.response.json();",
                       "  pm.expect(body.success).to.be.true;",
                       "  pm.expect(body.data.status).to.equal('analyzed');",
-                      "  pm.expect(body.data).to.have.property('reportUrl');",
                       "});"
                     ],
                     "type": "text/javascript"

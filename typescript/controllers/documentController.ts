@@ -297,24 +297,3 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentAnalyzed, { document, reportId: report.id });
 };
 
-// Scarica il report PDF del documento direttamente da MinIO 
-export const downloadReport = async (req: Request, res: Response): Promise<void> => {
-  const document = await Document.findOne({ where: { id: req.params.id, userId: req.user.id } });
-  if (!document) {
-    ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
-    return;
-  }
-  if (!document.reportPath) {
-    ResponseFactory.sendError(res, ErrorEnum.ReportNotReady);
-    return;
-  }
-
-  try {
-    const stream = await MinioStorage.getInstance().getObject(MinioStorage.REPORTS_BUCKET, document.reportPath);
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="report_${document.id}.pdf"`);
-    stream.pipe(res);
-  } catch {
-    ResponseFactory.sendError(res, ErrorEnum.StorageError);
-  }
-};
