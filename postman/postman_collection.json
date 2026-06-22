@@ -1,4 +1,4 @@
-{
+﻿{
   "info": {
     "name": "Programmazione Avanzata",
     "_postman_id": "collection-programmazione-avanzata",
@@ -633,11 +633,12 @@
                   "script": {
                     "exec": [
                       "pm.test('Status code 201', () => pm.response.to.have.status(201));",
-                      "pm.test('documento creato', () => {",
+                      "pm.test('documento creato con PDF su MinIO', () => {",
                       "  const body = pm.response.json();",
                       "  pm.expect(body.success).to.be.true;",
                       "  pm.expect(body.data.id).to.be.a('number');",
                       "  pm.expect(body.data.status).to.equal('pending');",
+                      "  pm.expect(body.data.filePath).to.be.a('string');",
                       "  pm.environment.set('DOCUMENT_ID', body.data.id);",
                       "});"
                     ],
@@ -648,12 +649,15 @@
               "request": {
                 "method": "POST",
                 "header": [
-                  { "key": "Content-Type", "value": "application/json" },
                   { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
                 ],
                 "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"title\": \"Documento di test\",\n  \"description\": \"Descrizione del documento di test\"\n}"
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "title",       "value": "Documento di test ESG",              "type": "text" },
+                    { "key": "description", "value": "Bilancio di sostenibilità di test",   "type": "text" },
+                    { "key": "file",        "src": "C:/Users/PREDATOR/Programmazione_Avanzata/res/da987fa7_202606_PA_G00.pdf", "type": "file" }
+                  ]
                 },
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}}/documents",

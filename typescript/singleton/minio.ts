@@ -3,7 +3,8 @@ import { Client } from 'minio';
 // Pattern Singleton che garantisce un'unica connessione a MinIO
 class MinioStorage {
   private static instance: Client;
-  static readonly BUCKET = process.env.MINIO_BUCKET || 'compliance';
+  static readonly DOCUMENTS_BUCKET = process.env.MINIO_DOCUMENTS_BUCKET || 'compliance-documents';
+  static readonly REPORTS_BUCKET   = process.env.MINIO_REPORTS_BUCKET   || 'compliance-reports';
 
   static getInstance(): Client {
     if (!MinioStorage.instance) {
@@ -18,12 +19,12 @@ class MinioStorage {
     return MinioStorage.instance;
   }
 
-  // Crea il "bucket", ovvero delle cartelle in cui si salvano i PDF. 
-  static async ensureBucket(): Promise<void> {
+  static async ensureBuckets(): Promise<void> {
     const client = MinioStorage.getInstance();
-    const exists = await client.bucketExists(MinioStorage.BUCKET);
-    if (!exists) {
-      await client.makeBucket(MinioStorage.BUCKET);
+    for (const bucket of [MinioStorage.DOCUMENTS_BUCKET, MinioStorage.REPORTS_BUCKET]) {
+      if (!(await client.bucketExists(bucket))) {
+        await client.makeBucket(bucket);
+      }
     }
   }
 }

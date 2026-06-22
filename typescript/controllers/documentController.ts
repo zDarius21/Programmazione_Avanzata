@@ -212,23 +212,27 @@ export const createDocument = async (req: Request, res: Response): Promise<void>
     return;
   }
 
+  if (!req.file) {
+    ResponseFactory.sendError(res, ErrorEnum.FileRequired);
+    return;
+  }
+
   const document = await Document.create({ userId: req.user.id, title, description });
 
-  if (req.file) {
-    const fileKey = `documents/${document.id}/original.pdf`;
-    try {
-      await MinioStorage.getInstance().putObject(
-        MinioStorage.BUCKET,
-        fileKey,
-        req.file.buffer,
-        req.file.size,
-        { 'Content-Type': 'application/pdf' }
-      );
-      await document.update({ filePath: fileKey });
-    } catch {
-      ResponseFactory.sendError(res, ErrorEnum.StorageError);
-      return;
-    }
+  const fileKey = `${document.id}/original.pdf`;
+  try {
+    await MinioStorage.getInstance().putObject(
+      MinioStorage.DOCUMENTS_BUCKET,
+      fileKey,
+      req.file.buffer,
+      req.file.size,
+      { 'Content-Type': 'application/pdf' }
+    );
+    await document.update({ filePath: fileKey });
+  } catch {
+    await document.destroy();
+    ResponseFactory.sendError(res, ErrorEnum.StorageError);
+    return;
   }
 
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentCreated, document);
@@ -256,8 +260,8 @@ export const deleteDocument = async (req: Request, res: Response): Promise<void>
   }
 
   const client = MinioStorage.getInstance();
-  if (document.filePath)   await client.removeObject(MinioStorage.BUCKET, document.filePath).catch(() => {});
-  if (document.reportPath) await client.removeObject(MinioStorage.BUCKET, document.reportPath).catch(() => {});
+  if (document.filePath)   await client.removeObject(MinioStorage.DOCUMENTS_BUCKET, document.filePath).catch(() => {});
+  if (document.reportPath) await client.removeObject(MinioStorage.REPORTS_BUCKET,   document.reportPath).catch(() => {});
 
   await document.destroy();
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentDeleted, { message: `Documento "${document.title}" eliminato` });
@@ -270,11 +274,11 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
     ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
     return;
   }
-  const reportKey = `documents/${document.id}/report.pdf`;
+  const reportKey = `${document.id}/report.pdf`;
   try {
     const pdfBuffer = await generateReport(document);
     await MinioStorage.getInstance().putObject(
-      MinioStorage.BUCKET,
+      MinioStorage.REPORTS_BUCKET,
       reportKey,
       pdfBuffer,
       pdfBuffer.length,
@@ -306,7 +310,7 @@ export const downloadReport = async (req: Request, res: Response): Promise<void>
   }
 
   try {
-    const stream = await MinioStorage.getInstance().getObject(MinioStorage.BUCKET, document.reportPath);
+    const stream = await MinioStorage.getInstance().getObject(MinioStorage.REPORTS_BUCKET, document.reportPath);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="report_${document.id}.pdf"`);
     stream.pipe(res);

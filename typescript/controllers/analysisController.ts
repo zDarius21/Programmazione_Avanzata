@@ -26,7 +26,7 @@ export const getAnalysisById = async (req: Request, res: Response): Promise<void
   let reportUrl: string | null = null;
   if (document.reportPath) {
     reportUrl = await MinioStorage.getInstance().presignedGetObject(
-      MinioStorage.BUCKET,
+      MinioStorage.REPORTS_BUCKET,
       document.reportPath,
       15 * 60
     );

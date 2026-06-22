@@ -65,6 +65,9 @@ class RegulationAlreadyExists implements ErrorObj {
 }
 
 // Classi per errori relativi alle operazioni su MinIO
+class FileRequired implements ErrorObj {
+  getErrorObj() { return { status: 400, message: ErrorMessages.ERR_FILE_REQUIRED }; }
+}
 class InvalidFileType implements ErrorObj {
   getErrorObj() { return { status: 400, message: ErrorMessages.ERR_INVALID_FILE_TYPE }; }
 }
@@ -100,6 +103,7 @@ export enum ErrorEnum {
   RegulationNotFound       = 'RegulationNotFound',
   RegulationFieldsRequired = 'RegulationFieldsRequired',
   RegulationAlreadyExists  = 'RegulationAlreadyExists',
+  FileRequired             = 'FileRequired',
   InvalidFileType          = 'InvalidFileType',
   ReportNotReady           = 'ReportNotReady',
   StorageError             = 'StorageError',
@@ -126,6 +130,7 @@ export function getError(type: ErrorEnum): ErrorObj {
     case ErrorEnum.RegulationNotFound:       return new RegulationNotFound();
     case ErrorEnum.RegulationFieldsRequired: return new RegulationFieldsRequired();
     case ErrorEnum.RegulationAlreadyExists:  return new RegulationAlreadyExists();
+    case ErrorEnum.FileRequired:             return new FileRequired();
     case ErrorEnum.InvalidFileType:          return new InvalidFileType();
     case ErrorEnum.ReportNotReady:           return new ReportNotReady();
     case ErrorEnum.StorageError:             return new StorageError();

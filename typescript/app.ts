@@ -32,15 +32,10 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ success: false, error: 'Errore interno del server' });
 });
 
-// Connessione al database e a MinIO — avviene in background all'import del modulo
-Database.getInstance()
-  .authenticate()
-  .then(() => Database.getInstance().sync())
-  .then(() => MinioStorage.ensureBucket())
-  .then(() => console.log('Database connected and synced'))
-  .catch((err: Error) => {
-    console.error('Startup failed:', err.message);
-    process.exit(1);
-  });
+export async function initializeServices(): Promise<void> {
+  await Database.getInstance().authenticate();
+  await Database.getInstance().sync();
+  await MinioStorage.ensureBuckets();
+}
 
 export default app;

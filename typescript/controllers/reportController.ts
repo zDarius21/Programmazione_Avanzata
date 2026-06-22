@@ -13,7 +13,7 @@ export const downloadReport = async (req: Request, res: Response): Promise<void>
   }
 
   try {
-    const stream = await MinioStorage.getInstance().getObject(MinioStorage.BUCKET, report.filePath);
+    const stream = await MinioStorage.getInstance().getObject(MinioStorage.REPORTS_BUCKET, report.filePath);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="report_${report.id}.pdf"`);
     stream.pipe(res);
