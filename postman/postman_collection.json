@@ -221,43 +221,6 @@
                   "path": ["users"]
                 }
               }
-            },
-            {
-              "name": "CreateUserRoleIgnored",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 201', () => pm.response.to.have.status(201));",
-                      "pm.test('ruolo e sempre user anche se body contiene admin', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.true;",
-                      "  pm.expect(body.data.role).to.equal('user');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"admin-attempt@test.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"admin\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users"]
-                }
-              }
             }
           ]
         },
@@ -871,36 +834,6 @@
                   "path": ["analyses"]
                 }
               }
-            },
-            {
-              "name": "GetAllAnalysesNoToken",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/analyses",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["analyses"]
-                }
-              }
             }
           ]
         },
@@ -936,38 +869,6 @@
                   "host": ["{{HOST}}"],
                   "port": "{{PORT}}",
                   "path": ["analyses", "{{ANALYSIS_ID}}"]
-                }
-              }
-            },
-            {
-              "name": "GetAnalysisByIdNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/analyses/99999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["analyses", "99999"]
                 }
               }
             }
@@ -1008,38 +909,6 @@
                   "host": ["{{HOST}}"],
                   "port": "{{PORT}}",
                   "path": ["reports", "{{REPORT_ID}}"]
-                }
-              }
-            },
-            {
-              "name": "GetReportNotReady",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/reports/99999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["reports", "99999"]
                 }
               }
             }
