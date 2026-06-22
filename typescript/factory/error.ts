@@ -6,6 +6,17 @@ interface ErrorObj {
   getErrorObj(): { status: number; message: string };
 }
 
+// Classi per errori di autenticazione e autorizzazione
+class TokenMissing implements ErrorObj {
+  getErrorObj() { return { status: 401, message: ErrorMessages.ERR_TOKEN_MISSING }; }
+}
+class TokenInvalid implements ErrorObj {
+  getErrorObj() { return { status: 401, message: ErrorMessages.ERR_TOKEN_INVALID }; }
+}
+class Forbidden implements ErrorObj {
+  getErrorObj() { return { status: 403, message: ErrorMessages.ERR_FORBIDDEN }; }
+}
+
 // Classi per errori di Login e Registrazione
 class MissingEmailPassword implements ErrorObj {
   getErrorObj() { return { status: 400, message: ErrorMessages.ERR_MISSING_EMAIL_PASSWORD }; }
@@ -53,8 +64,22 @@ class RegulationAlreadyExists implements ErrorObj {
   getErrorObj() { return { status: 409, message: ErrorMessages.ERR_REGULATION_ALREADY_EXISTS }; }
 }
 
-// Enum con tutti i tipi di errore 
+// Classi per errori relativi alle operazioni su MinIO
+class InvalidFileType implements ErrorObj {
+  getErrorObj() { return { status: 400, message: ErrorMessages.ERR_INVALID_FILE_TYPE }; }
+}
+class ReportNotReady implements ErrorObj {
+  getErrorObj() { return { status: 409, message: ErrorMessages.ERR_REPORT_NOT_READY }; }
+}
+class StorageError implements ErrorObj {
+  getErrorObj() { return { status: 503, message: ErrorMessages.ERR_STORAGE_ERROR }; }
+}
+
+// Enum con tutti i tipi di errore
 export enum ErrorEnum {
+  TokenMissing             = 'TokenMissing',
+  TokenInvalid             = 'TokenInvalid',
+  Forbidden                = 'Forbidden',
   MissingEmailPassword     = 'MissingEmailPassword',
   EmailAlreadyRegistered   = 'EmailAlreadyRegistered',
   InvalidCredentials       = 'InvalidCredentials',
@@ -68,11 +93,17 @@ export enum ErrorEnum {
   RegulationNotFound       = 'RegulationNotFound',
   RegulationFieldsRequired = 'RegulationFieldsRequired',
   RegulationAlreadyExists  = 'RegulationAlreadyExists',
+  InvalidFileType          = 'InvalidFileType',
+  ReportNotReady           = 'ReportNotReady',
+  StorageError             = 'StorageError',
 }
 
 // Funzione che riceve il tipo di enum di errore e restituisce l'istanza della classe corrispondente
 export function getError(type: ErrorEnum): ErrorObj {
   switch (type) {
+    case ErrorEnum.TokenMissing:             return new TokenMissing();
+    case ErrorEnum.TokenInvalid:             return new TokenInvalid();
+    case ErrorEnum.Forbidden:                return new Forbidden();
     case ErrorEnum.MissingEmailPassword:     return new MissingEmailPassword();
     case ErrorEnum.EmailAlreadyRegistered:   return new EmailAlreadyRegistered();
     case ErrorEnum.InvalidCredentials:       return new InvalidCredentials();
@@ -86,5 +117,8 @@ export function getError(type: ErrorEnum): ErrorObj {
     case ErrorEnum.RegulationNotFound:       return new RegulationNotFound();
     case ErrorEnum.RegulationFieldsRequired: return new RegulationFieldsRequired();
     case ErrorEnum.RegulationAlreadyExists:  return new RegulationAlreadyExists();
+    case ErrorEnum.InvalidFileType:          return new InvalidFileType();
+    case ErrorEnum.ReportNotReady:           return new ReportNotReady();
+    case ErrorEnum.StorageError:             return new StorageError();
   }
 }

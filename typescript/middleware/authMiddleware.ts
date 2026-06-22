@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import fs from 'node:fs';
 import jwt from 'jsonwebtoken';
-import ResponseFactory from '../factory/responseFactory';
+import ResponseFactory, { ErrorEnum } from '../factory/responseFactory';
 
 // La chiave pubblica viene usata per verificare la firma dei token in entrata
 const PUBLIC_KEY = fs.readFileSync(process.env.JWT_PUBLIC_KEY_PATH ?? '', 'utf8');
@@ -27,7 +27,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
-    ResponseFactory.error(res, 'Token mancante', 401);
+    ResponseFactory.sendError(res, ErrorEnum.TokenMissing);
     return;
   }
 
@@ -38,6 +38,6 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     req.user = jwt.verify(token, PUBLIC_KEY, { algorithms: ['RS256'] }) as AuthPayload;
     next();
   } catch {
-    ResponseFactory.error(res, 'Token non valido o scaduto', 401);
+    ResponseFactory.sendError(res, ErrorEnum.TokenInvalid);
   }
 };

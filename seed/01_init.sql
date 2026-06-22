@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS documents (
   title         VARCHAR(255)  NOT NULL,
   description   TEXT          NOT NULL,
   status        document_status NOT NULL DEFAULT 'pending',
+  "filePath"    VARCHAR(500),
+  "reportPath"  VARCHAR(500),
   "createdAt"   TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   "updatedAt"   TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );

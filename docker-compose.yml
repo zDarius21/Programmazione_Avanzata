@@ -10,8 +10,11 @@ services:
     environment:
       - DB_HOST=db
       - DB_PORT=5432
+      - MINIO_ENDPOINT=minio
     depends_on:
       db:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     volumes:
       - ./keys:/usr/src/app/keys:ro
@@ -34,5 +37,24 @@ services:
       timeout: 5s
       retries: 5
 
+  minio:
+    image: quay.io/minio/minio
+    container_name: compliance_minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
+  minio_data:

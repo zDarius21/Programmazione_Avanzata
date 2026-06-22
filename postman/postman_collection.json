@@ -47,78 +47,6 @@
                   "path": ["auth", "register"]
                 }
               }
-            },
-            {
-              "name": "RegisterMissingFields",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"utente@test.com\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/auth/register",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["auth", "register"]
-                }
-              }
-            },
-            {
-              "name": "RegisterDuplicateEmail",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 409', () => pm.response.to.have.status(409));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"Password123!\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/auth/register",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["auth", "register"]
-                }
-              }
             }
           ]
         },
@@ -155,78 +83,6 @@
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"Password123!\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/auth/login",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["auth", "login"]
-                }
-              }
-            },
-            {
-              "name": "LoginMissingFields",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"utente@test.com\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/auth/login",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["auth", "login"]
-                }
-              }
-            },
-            {
-              "name": "LoginInvalidCredentials",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"utente@test.com\",\n  \"password\": \"WrongPassword!\"\n}"
                 },
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}}/auth/login",
@@ -281,66 +137,6 @@
                   "path": ["users"]
                 }
               }
-            },
-            {
-              "name": "GetAllUsersUnauthorized",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users"]
-                }
-              }
-            },
-            {
-              "name": "GetAllUsersForbidden",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 403', () => pm.response.to.have.status(403));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users"]
-                }
-              }
             }
           ]
         },
@@ -373,67 +169,6 @@
                 "header": [
                   { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
                 ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users/{{USER_ID}}",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users", "{{USER_ID}}"]
-                }
-              }
-            },
-            {
-              "name": "GetUserByIdNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users/999999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users", "999999"]
-                }
-              }
-            },
-            {
-              "name": "GetUserByIdUnauthorized",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}}/users/{{USER_ID}}",
                   "protocol": "http",
@@ -523,115 +258,6 @@
                   "path": ["users"]
                 }
               }
-            },
-            {
-              "name": "CreateUserMissingFields",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"solo-email@test.com\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users"]
-                }
-              }
-            },
-            {
-              "name": "CreateUserDuplicateEmail",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 409', () => pm.response.to.have.status(409));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"nuovo@test.com\",\n  \"password\": \"Password123!\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users"]
-                }
-              }
-            },
-            {
-              "name": "CreateUserUnauthorized",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"no-auth@test.com\",\n  \"password\": \"Password123!\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users"]
-                }
-              }
             }
           ]
         },
@@ -711,115 +337,6 @@
                   "path": ["users", "{{USER_ID}}"]
                 }
               }
-            },
-            {
-              "name": "UpdateUserDuplicateEmail",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 409', () => pm.response.to.have.status(409));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "PUT",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"utente@test.com\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users/{{USER_ID}}",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users", "{{USER_ID}}"]
-                }
-              }
-            },
-            {
-              "name": "UpdateUserNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "PUT",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"ghost@test.com\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users/999999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users", "999999"]
-                }
-              }
-            },
-            {
-              "name": "UpdateUserUnauthorized",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "PUT",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"no-auth@test.com\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users/{{USER_ID}}",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users", "{{USER_ID}}"]
-                }
-              }
             }
           ]
         },
@@ -850,67 +367,6 @@
                 "header": [
                   { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
                 ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users/{{USER_ID}}",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users", "{{USER_ID}}"]
-                }
-              }
-            },
-            {
-              "name": "DeleteUserNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/users/999999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["users", "999999"]
-                }
-              }
-            },
-            {
-              "name": "DeleteUserUnauthorized",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "DELETE",
-                "header": [],
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}}/users/{{USER_ID}}",
                   "protocol": "http",
@@ -953,35 +409,6 @@
                 "header": [
                   { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
                 ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations"]
-                }
-              }
-            },
-            {
-              "name": "GetAllRegulationsUnauthorized",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401 senza token', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}}/regulations",
                   "protocol": "http",
@@ -1034,115 +461,6 @@
                   "path": ["regulations"]
                 }
               }
-            },
-            {
-              "name": "CreateRegulationMissingFields",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"CSRD\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations"]
-                }
-              }
-            },
-            {
-              "name": "CreateRegulationDuplicate",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 409', () => pm.response.to.have.status(409));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"Corporate Sustainability Reporting Directive\",\n  \"version\": \"1.0\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations"]
-                }
-              }
-            },
-            {
-              "name": "CreateRegulationForbiddenUser",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 403 se non admin', () => pm.response.to.have.status(403));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"GRI\",\n  \"description\": \"Global Reporting Initiative\",\n  \"version\": \"2.0\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations"]
-                }
-              }
             }
           ]
         },
@@ -1178,37 +496,6 @@
                   "host": ["{{HOST}}"],
                   "port": "{{PORT}}",
                   "path": ["regulations", "{{REGULATION_ID}}"]
-                }
-              }
-            },
-            {
-              "name": "GetRegulationByIdNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations/99999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations", "99999"]
                 }
               }
             }
@@ -1253,146 +540,12 @@
                   "path": ["regulations", "{{REGULATION_ID}}"]
                 }
               }
-            },
-            {
-              "name": "UpdateRegulationNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "PUT",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"desc\",\n  \"version\": \"2.0\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations/99999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations", "99999"]
-                }
-              }
-            },
-            {
-              "name": "UpdateRegulationForbiddenUser",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 403 se non admin', () => pm.response.to.have.status(403));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "PUT",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"desc\",\n  \"version\": \"2.0\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations/{{REGULATION_ID}}",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations", "{{REGULATION_ID}}"]
-                }
-              }
             }
           ]
         },
         {
           "name": "DELETE /regulations/:id",
           "item": [
-            {
-              "name": "DeleteRegulationForbiddenUser",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 403 se non admin', () => pm.response.to.have.status(403));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations/{{REGULATION_ID}}",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations", "{{REGULATION_ID}}"]
-                }
-              }
-            },
-            {
-              "name": "DeleteRegulationNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/regulations/99999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["regulations", "99999"]
-                }
-              }
-            },
             {
               "name": "DeleteRegulationSuccess",
               "event": [
@@ -1466,36 +619,6 @@
                   "path": ["documents"]
                 }
               }
-            },
-            {
-              "name": "GetAllDocumentsNoToken",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/documents",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["documents"]
-                }
-              }
             }
           ]
         },
@@ -1531,78 +654,6 @@
                 "body": {
                   "mode": "raw",
                   "raw": "{\n  \"title\": \"Documento di test\",\n  \"description\": \"Descrizione del documento di test\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/documents",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["documents"]
-                }
-              }
-            },
-            {
-              "name": "CreateDocumentMissingFields",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 400', () => pm.response.to.have.status(400));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"title\": \"Solo titolo\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/documents",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["documents"]
-                }
-              }
-            },
-            {
-              "name": "CreateDocumentNoToken",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 401', () => pm.response.to.have.status(401));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"title\": \"Documento\",\n  \"description\": \"Descrizione\"\n}"
                 },
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}}/documents",
@@ -1650,38 +701,6 @@
                   "path": ["documents", "{{DOCUMENT_ID}}"]
                 }
               }
-            },
-            {
-              "name": "GetDocumentByIdNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/documents/99999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["documents", "99999"]
-                }
-              }
             }
           ]
         },
@@ -1724,42 +743,6 @@
                   "path": ["documents", "{{DOCUMENT_ID}}"]
                 }
               }
-            },
-            {
-              "name": "UpdateDocumentNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "PUT",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" },
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"title\": \"Titolo\",\n  \"description\": \"Descrizione\"\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/documents/99999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["documents", "99999"]
-                }
-              }
             }
           ]
         },
@@ -1797,69 +780,6 @@
                   "path": ["documents", "{{DOCUMENT_ID}}", "analyze"]
                 }
               }
-            },
-            {
-              "name": "AnalyzeDocumentAlreadyAnalyzed",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 409', () => pm.response.to.have.status(409));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "  pm.expect(body.error).to.be.a('string');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/documents/{{DOCUMENT_ID}}/analyze",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["documents", "{{DOCUMENT_ID}}", "analyze"]
-                }
-              }
-            },
-            {
-              "name": "AnalyzeDocumentNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/documents/99999/analyze",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["documents", "99999", "analyze"]
-                }
-              }
             }
           ]
         },
@@ -1895,37 +815,6 @@
                   "host": ["{{HOST}}"],
                   "port": "{{PORT}}",
                   "path": ["documents", "{{DOCUMENT_ID}}"]
-                }
-              }
-            },
-            {
-              "name": "DeleteDocumentNotFound",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code 404', () => pm.response.to.have.status(404));",
-                      "pm.test('success false', () => {",
-                      "  const body = pm.response.json();",
-                      "  pm.expect(body.success).to.be.false;",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
-                ],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/documents/99999",
-                  "protocol": "http",
-                  "host": ["{{HOST}}"],
-                  "port": "{{PORT}}",
-                  "path": ["documents", "99999"]
                 }
               }
             }

@@ -11,10 +11,12 @@ interface DocumentAttributes {
   title: string;
   description: string;
   status: DocumentStatus;
+  filePath: string | null;
+  reportPath: string | null;
 }
 
-// In fase di creazione: id è auto-generato, status ha default 'pending'
-interface DocumentCreationAttributes extends Optional<DocumentAttributes, 'id' | 'status'> {}
+// In fase di creazione: id è auto-generato, status ha default 'pending', i path sono opzionali
+interface DocumentCreationAttributes extends Optional<DocumentAttributes, 'id' | 'status' | 'filePath' | 'reportPath'> {}
 
 class Document extends Model<DocumentAttributes, DocumentCreationAttributes> implements DocumentAttributes {
   declare id: number;
@@ -22,15 +24,19 @@ class Document extends Model<DocumentAttributes, DocumentCreationAttributes> imp
   declare title: string;
   declare description: string;
   declare status: DocumentStatus;
+  declare filePath: string | null;
+  declare reportPath: string | null;
 }
 
 Document.init(
   {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    userId: { type: DataTypes.INTEGER, allowNull: false },
-    title: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.TEXT, allowNull: false },
-    status: { type: DataTypes.ENUM('pending', 'analyzed'), allowNull: false, defaultValue: 'pending' },
+    id:          { type: DataTypes.INTEGER,                           autoIncrement: true, primaryKey: true },
+    userId:      { type: DataTypes.INTEGER,                           allowNull: false },
+    title:       { type: DataTypes.STRING,                            allowNull: false },
+    description: { type: DataTypes.TEXT,                              allowNull: false },
+    status:      { type: DataTypes.ENUM('pending', 'analyzed'),       allowNull: false, defaultValue: 'pending' },
+    filePath:    { type: DataTypes.STRING(500),                       allowNull: true },
+    reportPath:  { type: DataTypes.STRING(500),                       allowNull: true },
   },
   {
     sequelize: Database.getInstance(),
