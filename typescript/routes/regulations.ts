@@ -11,7 +11,7 @@ router.get('/:id', authenticate, getRegulationById);
 
 // Rotte riservate agli admin per operazioni CUD
 router.post('/', authenticate, requireAdmin, createRegulation);
-router.put('/:id', authenticate, requireAdmin, updateRegulation);
+router.patch('/:id', authenticate, requireAdmin, updateRegulation);
 router.delete('/:id', authenticate, requireAdmin, deleteRegulation);
 
 export default router;

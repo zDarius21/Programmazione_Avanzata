@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import Report from '../models/Report';
+import ReportDAO from '../dao/ReportDAO';
 import MinioStorage from '../singleton/minio';
 import ResponseFactory, { ErrorEnum } from '../factory/responseFactory';
 
 // Scarica il report PDF identificato dal proprio ID
 export const downloadReport = async (req: Request, res: Response): Promise<void> => {
-  const report = await Report.findOne({ where: { id: req.params.id, userId: req.user.id } });
+  const report = await ReportDAO.findByIdAndUser(req.params.id, req.user.id);
 
   if (!report) {
     ResponseFactory.sendError(res, ErrorEnum.ReportNotFound);

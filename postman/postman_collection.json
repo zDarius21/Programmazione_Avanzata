@@ -262,7 +262,7 @@
           ]
         },
         {
-          "name": "PUT Update User",
+          "name": "PATCH Update User",
           "item": [
             {
               "name": "UpdateUserEmailSuccess",
@@ -283,7 +283,7 @@
                 }
               ],
               "request": {
-                "method": "PUT",
+                "method": "PATCH",
                 "header": [
                   { "key": "Content-Type", "value": "application/json" },
                   { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
@@ -320,7 +320,7 @@
                 }
               ],
               "request": {
-                "method": "PUT",
+                "method": "PATCH",
                 "header": [
                   { "key": "Content-Type", "value": "application/json" },
                   { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
@@ -502,7 +502,7 @@
           ]
         },
         {
-          "name": "PUT /regulations/:id",
+          "name": "PATCH /regulations/:id",
           "item": [
             {
               "name": "UpdateRegulationSuccess",
@@ -523,7 +523,7 @@
                 }
               ],
               "request": {
-                "method": "PUT",
+                "method": "PATCH",
                 "header": [
                   { "key": "Content-Type", "value": "application/json" },
                   { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
@@ -730,7 +730,7 @@
                 }
               ],
               "request": {
-                "method": "PUT",
+                "method": "PATCH",
                 "header": [
                   { "key": "Content-Type", "value": "application/json" },
                   { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }

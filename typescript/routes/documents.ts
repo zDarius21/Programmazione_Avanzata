@@ -8,7 +8,7 @@ import {
   updateDocument,
   deleteDocument,
   analyzeDocument,
-  downloadReport,
+
 } from '../controllers/documentController';
 
 const router = Router();
@@ -19,13 +19,10 @@ router.use(authenticate);
 router.get('/',            getAllDocuments);
 router.get('/:id',         getDocumentById);
 router.post('/',  uploadPdf, createDocument);   // accetta opzionalmente un file PDF nel campo "file"
-router.put('/:id',         updateDocument);
+router.patch('/:id',         updateDocument);
 router.delete('/:id',      deleteDocument);
 
 // Avvia l'analisi ESG e genera il report PDF su MinIO
 router.post('/:id/analyze',  analyzeDocument);
-
-// Scarica il report PDF generato dall'analisi
-router.get('/:id/report',    downloadReport);
 
 export default router;
