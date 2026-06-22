@@ -99,8 +99,9 @@ $ docker-compose up
 Il servizio è disponibile sulla porta **3000** tramite cURL o Postman.
 
 ## Testing
-Importare la collection Postman fornita (`postman_collection.json`) per eseguire i test predefiniti su tutti gli endpoint. I token JWT sono firmati con chiave RS256.
+Importare la collection Postman fornita "postman_collection.json"  e l'environment fornito "postman_environment.json" per eseguire i test predefiniti su tutti gli endpoint. I token JWT sono firmati con chiave RS256.
 
 ## Autore
 * Dario Tommasi ([Github](https://github.com/zDarius))
 * Bargilli Andrea ([Github](https://github.com/Bargi20))
+
