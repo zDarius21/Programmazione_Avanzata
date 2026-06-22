@@ -85,6 +85,10 @@ Le **rotte dei report** permettono agli utenti di recuperare i report generati i
 
 **Chain of Responsibility** filtra le richieste attraverso livelli middleware: validazione JWT → verifica ruolo (admin/user) → logica di business → gestione errori.
 
+**Model-View-Controller** gestisce in maniera strutturata le richieste, tramite la divisione degli incarichi tra i vari elementi.
+
+**Data Access Object** fornisce un'astrazione per l'accesso ai dati del database.
+
 ## Avvio del Servizio
 Requisiti: Docker installato
 
