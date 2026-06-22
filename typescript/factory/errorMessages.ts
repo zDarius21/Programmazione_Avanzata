@@ -19,4 +19,5 @@ export const ERR_INVALID_FILE_TYPE           = 'Solo file PDF sono accettati (ma
 export const ERR_REPORT_NOT_READY            = 'Il report non è ancora disponibile, eseguire prima l\'analisi del documento';
 export const ERR_STORAGE_ERROR               = 'Errore durante l\'operazione sul file storage';
 export const ERR_ANALYSIS_NOT_FOUND          = 'Analisi non trovata';
+export const ERR_REPORT_NOT_FOUND            = 'Report non trovato';
 
