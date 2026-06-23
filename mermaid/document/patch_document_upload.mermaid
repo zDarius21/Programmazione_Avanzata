@@ -1,0 +1,43 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Router<br/>/documents/:id
+    participant Auth as authenticate<br/>(JWT Middleware)
+    participant Controller as DocumentController
+    participant DAO as DocumentDAO
+    participant DB@{ shape: "database" } as Database
+
+    Client->>+Router: PATCH /documents/:id<br/>{ title?, description? }
+
+    Router->>+Auth: authenticate(req, res, next)
+
+    rect rgb(255, 240, 240)
+        note over Auth: Verifica JWT
+        alt token mancante o non valido
+            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+        end
+    end
+
+    Auth->>+Controller: updateDocument(req, res)
+
+    Controller->>+DAO: findByIdAndUser(id, userId)
+    DAO->>+DB: SELECT * FROM documents<br/>WHERE id = ? AND userId = ?
+    DB-->>-DAO: Document | null
+    DAO-->>-Controller: Document | null
+
+    rect rgb(255, 240, 240)
+        alt documento non trovato
+            Controller-->>Client: 404 Not Found<br/>{ error: "Documento non trovato" }
+        end
+    end
+
+    rect rgb(240, 255, 240)
+        note over Controller,DB: Aggiornamento documento
+        Controller->>+DAO: document.update({ title, description })
+        DAO->>+DB: UPDATE documents<br/>SET title = ?, description = ?<br/>WHERE id = ?
+        DB-->>-DAO: ok
+        DAO-->>-Controller: Document aggiornato
+    end
+
+    Controller-->>-Router: { document }
+    Router-->>-Client: 200 OK<br/>{ document }

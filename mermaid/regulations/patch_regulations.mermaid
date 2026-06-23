@@ -1,0 +1,77 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Router<br/>/regulations
+    participant Auth as authenticate<br/>(JWT Middleware)
+    participant Role as requireAdmin<br/>(Role Middleware)
+    participant Upload as uploadPdf<br/>(Multer)
+    participant Controller as RegulationController
+    participant PDF as pdf-parse
+    participant DAO as RegulationDAO
+    participant DB@{ shape: "database" } as Database
+
+    Client->>+Router: POST /regulations<br/>multipart/form-data<br/>{ name, version, description?, file? }
+
+    Router->>+Auth: authenticate(req, res, next)
+
+    rect rgb(255, 240, 240)
+        note over Auth: Verifica JWT
+        alt token mancante o non valido
+            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+        end
+    end
+
+    Auth->>+Role: requireAdmin(req, res, next)
+
+    rect rgb(255, 240, 240)
+        alt ruolo != "admin"
+            Role-->>Client: 403 Forbidden<br/>{ error: "Accesso negato" }
+        end
+    end
+
+    Role->>+Upload: uploadPdf(req, res, next)
+
+    rect rgb(255, 240, 240)
+        alt file non PDF o > 10 MB
+            Upload-->>Client: 400 Bad Request<br/>{ error: "Tipo file non valido" }
+        end
+    end
+
+    Upload->>+Controller: createRegulation(req, res)
+
+    rect rgb(240, 255, 240)
+        note over Controller,PDF: Estrazione testo da PDF (opzionale)
+        alt file allegato
+            Controller->>+PDF: new PDFParse({ data: buffer }).getText()
+            PDF-->>-Controller: { text }
+            note over Controller: description = text estratto dal PDF
+        end
+    end
+
+    rect rgb(255, 240, 240)
+        note over Controller: Validazione body
+        alt name, version o description mancanti
+            Controller-->>Client: 400 Bad Request<br/>{ error: "Campi normativa obbligatori" }
+        end
+    end
+
+    Controller->>+DAO: findByName(name)
+    DAO->>+DB: SELECT * FROM regulations<br/>WHERE name = ?
+    DB-->>-DAO: Regulation | null
+    DAO-->>-Controller: Regulation | null
+
+    rect rgb(255, 240, 240)
+        alt normativa già esistente
+            Controller-->>Client: 409 Conflict<br/>{ error: "Normativa già esistente" }
+        end
+    end
+
+    rect rgb(240, 255, 240)
+        Controller->>+DAO: create({ name, description, version })
+        DAO->>+DB: INSERT INTO regulations<br/>{ name, description, version }
+        DB-->>-DAO: Regulation
+        DAO-->>-Controller: Regulation
+    end
+
+    Controller-->>-Router: { regulation }
+    Router-->>-Client: 201 Created<br/>{ regulation }

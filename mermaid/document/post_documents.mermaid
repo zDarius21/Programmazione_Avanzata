@@ -1,0 +1,68 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Router<br/>/documents
+    participant Upload as uploadPdf<br/>(Multer)
+    participant Auth as authenticate<br/>(JWT Middleware)
+    participant Controller as DocumentController
+    participant DAO as DocumentDAO
+    participant DB@{ shape: "database" } as Database
+    participant Minio as MinIO Storage
+
+    Client->>+Router: POST /documents<br/>multipart/form-data<br/>{ title, description, file }
+
+    Router->>+Auth: authenticate(req, res, next)
+
+    rect rgb(255, 240, 240)
+        note over Auth: Verifica JWT
+        alt token mancante o non valido
+            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+        end
+    end
+
+    Auth->>+Upload: uploadPdf(req, res, next)
+
+    rect rgb(255, 240, 240)
+        note over Upload: Validazione file
+        alt file non PDF
+            Upload-->>Client: 400 Bad Request<br/>{ error: "Tipo file non valido" }
+        end
+    end
+
+    Upload->>+Controller: createDocument(req, res)
+
+    rect rgb(255, 240, 240)
+        note over Controller: Validazione body
+        alt title o description mancanti
+            Controller-->>Client: 400 Bad Request<br/>{ error: "Title e description sono obbligatori" }
+        end
+        alt file assente
+            Controller-->>Client: 400 Bad Request<br/>{ error: "File obbligatorio" }
+        end
+    end
+
+    Controller->>+DAO: create({ userId, title, description })
+    DAO->>+DB: INSERT INTO documents<br/>{ userId, title, description }
+    DB-->>-DAO: Document
+    DAO-->>-Controller: Document
+
+    rect rgb(240, 255, 240)
+        note over Controller,Minio: Upload PDF su MinIO
+        Controller->>+Minio: putObject(DOCUMENTS_BUCKET,<br/>"<id>/original.pdf", buffer)
+        Minio-->>-Controller: ok
+        Controller->>+DAO: document.update({ filePath })
+        DAO->>+DB: UPDATE documents<br/>SET filePath = ?
+        DB-->>-DAO: ok
+        DAO-->>-Controller: ok
+    end
+
+    rect rgb(255, 240, 240)
+        alt errore MinIO
+            Controller->>DAO: document.destroy()
+            DAO->>DB: DELETE FROM documents WHERE id = ?
+            Controller-->>Client: 500 Internal Server Error<br/>{ error: "Errore storage" }
+        end
+    end
+
+    Controller-->>-Router: { document }
+    Router-->>-Client: 201 Created<br/>{ document }

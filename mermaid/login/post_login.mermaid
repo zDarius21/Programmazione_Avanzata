@@ -1,0 +1,48 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Router<br/>/auth/login
+    participant Controller as AuthController
+    participant DAO as UserDAO
+    participant DB@{ "type": "database" } as Database
+    participant JWT as JWT (RS256)
+
+    Client->>+Router: POST /auth/login<br/>{ email, password }
+
+    Router->>+Controller: login(req, res)
+
+    rect rgb(255, 240, 240)
+        note over Controller: Validazione input
+        alt email o password mancanti
+            Controller-->>Client: 400 Bad Request<br/>{ error: "Credenziali mancanti" }
+        end
+    end
+
+    Controller->>+DAO: findByEmail(email)
+    DAO->>+DB: SELECT * FROM users<br/>WHERE email = ?
+    DB-->>-DAO: User | null
+    DAO-->>-Controller: User | null
+
+    rect rgb(255, 240, 240)
+        alt utente non trovato
+            Controller-->>Client: 401 Unauthorized<br/>{ error: "Utente non trovato" }
+        end
+    end
+
+    Controller->>+JWT: bcrypt.compare(password, user.password)
+    JWT-->>-Controller: boolean
+
+    rect rgb(255, 240, 240)
+        alt password errata
+            Controller-->>Client: 401 Unauthorized<br/>{ error: "Credenziali non valide" }
+        end
+    end
+
+    rect rgb(240, 255, 240)
+        note over Controller,JWT: Autenticazione riuscita
+        Controller->>+JWT: jwt.sign({ id, email, role },<br/>privateKey, { algorithm: RS256,<br/>expiresIn: JWT_EXPIRES_IN })
+        JWT-->>-Controller: accessToken
+    end
+
+    Controller-->>-Router: { token, role }
+    Router-->>-Client: 200 OK<br/>{ token: "eyJ...", role: "..." }

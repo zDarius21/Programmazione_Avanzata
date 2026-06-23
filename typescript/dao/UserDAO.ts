@@ -76,7 +76,7 @@ class UserDAO implements IDao<User, UserCreateData> {
   }
 
   async refillTokens(amount: number = 10, cap: number = 100): Promise<void> {
-    await User.sequelize!.query(
+    await User.sequelize?.query(
       `UPDATE users SET tokens = LEAST(tokens + :amount, :cap)`,
       { replacements: { amount, cap } }
     );
