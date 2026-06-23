@@ -7,7 +7,8 @@ const multerInstance = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
+    const isPdf = file.mimetype === 'application/pdf' || file.originalname.toLowerCase().endsWith('.pdf');
+    if (isPdf) {
       cb(null, true);
     } else {
       cb(new Error('InvalidFileType'));

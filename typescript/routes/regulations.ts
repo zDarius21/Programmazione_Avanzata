@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { getAllRegulations, getRegulationById, createRegulation, updateRegulation, deleteRegulation } from '../controllers/regulationController';
 import { authenticate } from '../middleware/authMiddleware';
 import { requireAdmin } from '../middleware/roleMiddleware';
+import { uploadPdf } from '../middleware/uploadMiddleware';
 
 const router = Router();
 
@@ -10,7 +11,7 @@ router.get('/', authenticate, getAllRegulations);
 router.get('/:id', authenticate, getRegulationById);
 
 // Rotte riservate agli admin per operazioni CUD
-router.post('/', authenticate, requireAdmin, createRegulation);
+router.post('/', authenticate, requireAdmin, uploadPdf, createRegulation);
 router.patch('/:id', authenticate, requireAdmin, updateRegulation);
 router.delete('/:id', authenticate, requireAdmin, deleteRegulation);
 

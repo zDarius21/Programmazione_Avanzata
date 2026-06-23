@@ -1,36 +1,98 @@
 import Document from '../models/Document';
 import { IDao } from './IDao';
+import { AppError, ErrorEnum } from '../factory/error';
 
 type DocumentCreateData = { userId: number; title: string; description: string };
 
 // DAO per le operazioni di accesso ai dati dei documenti
 class DocumentDAO implements IDao<Document, DocumentCreateData> {
-  findAll() {
-    return Document.findAll();
+  /** Restituisce tutti i documenti presenti nel database. */
+  async findAll() {
+    try {
+      return await Document.findAll();
+    } catch {
+      throw new AppError(ErrorEnum.DatabaseError);
+    }
   }
 
-  findById(id: string | number) {
-    return Document.findByPk(id);
+  /** 
+   * Funzione di Ricerca tramite ID del documento.
+   * @param id - L'id del documento da cercare.
+   * @returns Restituisce il documento corrispondente all'id fornito, o null se non esiste. 
+   * */
+  async findById(id: string | number) {
+    try {
+      return await Document.findByPk(id);
+    } catch {
+      throw new AppError(ErrorEnum.DatabaseError);
+    }
   }
 
-  findAllByUser(userId: number) {
-    return Document.findAll({ where: { userId } });
+  /** 
+   * Funzione di Ricerca tramite ID dell'utente.
+   * @param userId - L'id dell'utente da cercare.
+   * @returns Restituisce tutti i documenti appartenenti all'utente specificato.
+   * */
+  async findAllByUser(userId: number) {
+    try {
+      return await Document.findAll({ where: { userId } });
+    } catch {
+      throw new AppError(ErrorEnum.DatabaseError);
+    }
   }
 
-  findByIdAndUser(id: string | number, userId: number) {
-    return Document.findOne({ where: { id, userId } });
+  /** 
+   * Funzione di Ricerca tramite ID del documento e ID dell'utente.
+   * @param id - L'id del documento da cercare.
+   * @param userId - L'id dell'utente da cercare.
+   * @returns Restituisce il documento con l'id dato appartenente all'utente, o null se non trovato.
+   * */
+  async findByIdAndUser(id: string | number, userId: number) {
+    try {
+      return await Document.findOne({ where: { id, userId } });
+    } catch {
+      throw new AppError(ErrorEnum.DatabaseError);
+    }
   }
 
-  findAllAnalyzedByUser(userId: number) {
-    return Document.findAll({ where: { userId, status: 'analyzed' } });
+  /** 
+   * Funzione di Ricerca di tutti i documenti analizzati appartenenti all'utente.
+   * @param userId - L'id dell'utente da cercare.
+   * @returns Restituisce tutti i documenti con status 'analyzed' appartenenti all'utente.
+   * */
+  async findAllAnalyzedByUser(userId: number) {
+    try {
+      return await Document.findAll({ where: { userId, status: 'analyzed' } });
+    } catch {
+      throw new AppError(ErrorEnum.DatabaseError);
+    }
   }
 
-  findAnalyzedByIdAndUser(id: string | number, userId: number) {
-    return Document.findOne({ where: { id, userId, status: 'analyzed' } });
+  /** 
+   * Funzione di Ricerca del documento analizzato tramite ID del documento e ID dell'utente.
+   * @param id - L'id del documento da cercare.
+   * @param userId - L'id dell'utente da cercare.
+   * @returns Restituisce il documento analizzato con l'id dato appartenente all'utente, o null se non trovato.
+   * */
+  async findAnalyzedByIdAndUser(id: string | number, userId: number) {
+    try {
+      return await Document.findOne({ where: { id, userId, status: 'analyzed' } });
+    } catch {
+      throw new AppError(ErrorEnum.DatabaseError);
+    }
   }
 
-  create(data: DocumentCreateData) {
-    return Document.create(data);
+  /** 
+   * Funzione di Creazione di un nuovo documento.
+   * @param data - I dati del documento da creare.
+   * @returns Restituisce il documento creato.
+   * */
+  async create(data: DocumentCreateData) {
+    try {
+      return await Document.create(data);
+    } catch {
+      throw new AppError(ErrorEnum.DatabaseError);
+    }
   }
 }
 

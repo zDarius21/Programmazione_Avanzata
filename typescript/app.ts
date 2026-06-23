@@ -1,6 +1,7 @@
 import express from 'express';
 import 'express-async-errors';
 import dotenv from 'dotenv';
+import { AppError } from './factory/error';
 import Database from './singleton/database';
 import MinioStorage from './singleton/minio';
 import UserDAO from './dao/UserDAO';
@@ -30,6 +31,9 @@ app.use('/reports', reportsRoutes);
 // Gestione centralizzata degli errori non catturati nei controller async
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Unhandled error:', err.message);
+  if (err instanceof AppError) {
+    return res.status(err.status).json({ success: false, error: err.message });
+  }
   res.status(500).json({ success: false, error: 'Errore interno del server' });
 });
 

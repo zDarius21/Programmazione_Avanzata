@@ -476,12 +476,16 @@
               "request": {
                 "method": "POST",
                 "header": [
-                  { "key": "Content-Type", "value": "application/json" },
                   { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
                 ],
                 "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"CSRD\",\n  \"description\": \"Corporate Sustainability Reporting Directive\",\n  \"version\": \"1.0\"\n}"
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "name",        "value": "CSRD",    "type": "text" },
+                    { "key": "version",     "value": "1.0",     "type": "text" },
+                    { "key": "file",        "src": "",          "type": "file", "description": "PDF opzionale: il testo estratto sostituisce la description" },
+                    { "key": "description", "value": "Corporate Sustainability Reporting Directive", "type": "text", "disabled": true }
+                  ]
                 },
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}}/regulations",

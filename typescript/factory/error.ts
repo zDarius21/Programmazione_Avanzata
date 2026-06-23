@@ -87,6 +87,10 @@ class InsufficientTokens implements ErrorObj {
   getErrorObj() { return { status: 402, message: ErrorMessages.ERR_INSUFFICIENT_TOKENS }; }
 }
 
+class DatabaseError implements ErrorObj {
+  getErrorObj() { return { status: 500, message: ErrorMessages.ERR_DATABASE_ERROR }; }
+}
+
 // Enum con tutti i tipi di errore
 export enum ErrorEnum {
   TokenMissing             = 'TokenMissing',
@@ -112,6 +116,7 @@ export enum ErrorEnum {
   AnalysisNotFound         = 'AnalysisNotFound',
   ReportNotFound           = 'ReportNotFound',
   InsufficientTokens       = 'InsufficientTokens',
+  DatabaseError            = 'DatabaseError',
 }
 
 // Funzione che riceve il tipo di enum di errore e restituisce l'istanza della classe corrispondente
@@ -140,6 +145,20 @@ export function getError(type: ErrorEnum): ErrorObj {
     case ErrorEnum.AnalysisNotFound:         return new AnalysisNotFound();
     case ErrorEnum.ReportNotFound:           return new ReportNotFound();
     case ErrorEnum.InsufficientTokens:       return new InsufficientTokens();
+    case ErrorEnum.DatabaseError:            return new DatabaseError();
     default: throw new Error(`Errore sconosciuto: ${type}`);
+  }
+}
+
+// Errore custom che porta status HTTP e messaggio dalla factory
+// Usata nei DAO e middleware per propagare errori senza accesso a res
+export class AppError extends Error {
+  readonly status: number;
+
+  constructor(type: ErrorEnum) {
+    const { status, message } = getError(type).getErrorObj();
+    super(message);
+    this.status = status;
+    this.name = 'AppError';
   }
 }

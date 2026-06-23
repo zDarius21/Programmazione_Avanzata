@@ -16,10 +16,11 @@ export const ERR_REGULATION_NOT_FOUND        = 'Normativa non trovata';
 export const ERR_REGULATION_FIELDS_REQUIRED  = 'name, description e version sono obbligatori';
 export const ERR_REGULATION_ALREADY_EXISTS   = 'Normativa già esistente';
 export const ERR_FILE_REQUIRED               = 'Il file PDF è obbligatorio';
-export const ERR_INVALID_FILE_TYPE           = 'Solo file PDF sono accettati (max 10 MB)';
+export const ERR_INVALID_FILE_TYPE           = 'Solo file PDF sono accettati';
 export const ERR_REPORT_NOT_READY            = 'Il report non è ancora disponibile, eseguire prima l\'analisi del documento';
 export const ERR_STORAGE_ERROR               = 'Errore durante l\'operazione sul file storage';
 export const ERR_ANALYSIS_NOT_FOUND          = 'Analisi non trovata';
 export const ERR_REPORT_NOT_FOUND            = 'Report non trovato';
 export const ERR_INSUFFICIENT_TOKENS         = 'Token insufficienti per eseguire l\'analisi (necessari 10 token)';
+export const ERR_DATABASE_ERROR              = 'Errore durante l\'operazione sul database';
 

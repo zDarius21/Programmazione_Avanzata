@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { PDFParse } from 'pdf-parse';
 import RegulationDAO from '../dao/RegulationDAO';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 
@@ -18,11 +19,18 @@ export const getRegulationById = async (req: Request, res: Response): Promise<vo
   ResponseFactory.sendSuccess(res, SuccessEnum.RegulationFetched, regulation);
 };
 
-// Crea una nuova normativa, controllando che non sia già presente e che tutti i campi siamo compilati
+// Crea una nuova normativa. Se viene allegato un PDF, il testo estratto sostituisce la description
 export const createRegulation = async (req: Request, res: Response): Promise<void> => {
-  const { name, description, version } = req.body;
+  const { name, version } = req.body;
+  let { description } = req.body;
 
-  if (!name || !description || !version) {
+  if (req.file) {
+    const parser = new PDFParse({ data: req.file.buffer });
+    const result = await parser.getText();
+    description = result.text.trim();
+  }
+
+  if (!name || !version || !description) {
     ResponseFactory.sendError(res, ErrorEnum.RegulationFieldsRequired);
     return;
   }
