@@ -3,6 +3,7 @@ import 'express-async-errors';
 import dotenv from 'dotenv';
 import Database from './singleton/database';
 import MinioStorage from './singleton/minio';
+import UserDAO from './dao/UserDAO';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import regulationRoutes from './routes/regulations';
@@ -32,10 +33,21 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ success: false, error: 'Errore interno del server' });
 });
 
+// Variabile utilizzata per fornire 10 token ogni 6h
+const TOKEN_REFILL = 6 * 60 * 60 * 1000; 
+
 export async function initializeServices(): Promise<void> {
   await Database.getInstance().authenticate();
   await Database.getInstance().sync();
+  await Database.getInstance().query(
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS tokens INTEGER NOT NULL DEFAULT 100;`
+  );
   await MinioStorage.ensureBuckets();
+
+  setInterval(async () => {
+    await UserDAO.refillTokens();
+    console.log(`Assegnazione token completata`);
+  }, TOKEN_REFILL);
 }
 
 export default app;

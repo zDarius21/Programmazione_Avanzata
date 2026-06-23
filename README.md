@@ -34,6 +34,9 @@ Le **rotte relative agli utenti** permettono all'**admin** di effettuare operazi
 | `POST` | /users | Sì (admin) | Crea un nuovo utente |
 | `PATCH` | /users/:id | Sì (admin) | Modifica i dati di un utente esistente |
 | `DELETE` | /users/:id | Sì (admin) | Elimina un utente |
+| `GET` | /users/token | Sì | Restituisce il numero di token rimanenti all'utente |
+
+
 
 ### Normative
 

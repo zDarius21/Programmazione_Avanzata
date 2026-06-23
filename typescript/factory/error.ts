@@ -83,7 +83,9 @@ class AnalysisNotFound implements ErrorObj {
 class ReportNotFound implements ErrorObj {
   getErrorObj() { return { status: 404, message: ErrorMessages.ERR_REPORT_NOT_FOUND }; }
 }
-
+class InsufficientTokens implements ErrorObj {
+  getErrorObj() { return { status: 402, message: ErrorMessages.ERR_INSUFFICIENT_TOKENS }; }
+}
 
 // Enum con tutti i tipi di errore
 export enum ErrorEnum {
@@ -109,6 +111,7 @@ export enum ErrorEnum {
   StorageError             = 'StorageError',
   AnalysisNotFound         = 'AnalysisNotFound',
   ReportNotFound           = 'ReportNotFound',
+  InsufficientTokens       = 'InsufficientTokens',
 }
 
 // Funzione che riceve il tipo di enum di errore e restituisce l'istanza della classe corrispondente
@@ -136,6 +139,7 @@ export function getError(type: ErrorEnum): ErrorObj {
     case ErrorEnum.StorageError:             return new StorageError();
     case ErrorEnum.AnalysisNotFound:         return new AnalysisNotFound();
     case ErrorEnum.ReportNotFound:           return new ReportNotFound();
+    case ErrorEnum.InsufficientTokens:       return new InsufficientTokens();
     default: throw new Error(`Errore sconosciuto: ${type}`);
   }
 }

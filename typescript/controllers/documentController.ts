@@ -3,6 +3,7 @@ import PDFDocument from 'pdfkit';
 import Document from '../models/Document';
 import DocumentDAO from '../dao/DocumentDAO';
 import ReportDAO from '../dao/ReportDAO';
+import UserDAO from '../dao/UserDAO';
 import MinioStorage from '../singleton/minio';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 
@@ -275,6 +276,13 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
     ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
     return;
   }
+
+  const user = await UserDAO.findByIdFull(req.user.id);
+  if (!user || user.tokens < 10) {
+    ResponseFactory.sendError(res, ErrorEnum.InsufficientTokens);
+    return;
+  }
+
   const reportKey = `${document.id}/report.pdf`;
   try {
     const pdfBuffer = await generateReport(document);
@@ -291,10 +299,15 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
   }
 
   await document.update({ status: 'analyzed', reportPath: reportKey });
+  await UserDAO.deductTokens(req.user.id);
 
   // Crea il record del report nel DB con il proprio ID univoco
   const report = await ReportDAO.create({ documentId: document.id, userId: req.user.id, filePath: reportKey });
 
-  ResponseFactory.sendSuccess(res, SuccessEnum.DocumentAnalyzed, { document, reportId: report.id });
+  ResponseFactory.sendSuccess(res, SuccessEnum.DocumentAnalyzed, {
+    document,
+    reportId: report.id,
+    tokensRemaining: user.tokens - 10,
+  });
 };
 

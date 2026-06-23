@@ -7,11 +7,15 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  getMyTokens,
 } from '../controllers/userController';
 
 const router = Router();
 
-// Tutte le rotte /users richiedono un token JWT valido con ruolo admin
+// Rotta accessibile a qualsiasi utente autenticato per controllare i propri token
+router.get('/tokens', authenticate, getMyTokens);
+
+// Le rotte seguenti richiedono un token JWT valido con ruolo admin
 router.use(authenticate, requireAdmin);
 
 router.get('/', getAllUsers);

@@ -304,6 +304,73 @@
           ]
         },
         {
+          "name": "GET /users/tokens",
+          "item": [
+            {
+              "name": "GetMyTokensSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('saldo token restituito', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.tokens).to.be.a('number');",
+                      "  pm.expect(body.data.tokens).to.be.at.least(0);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/users/tokens",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["users", "tokens"]
+                }
+              }
+            },
+            {
+              "name": "GetMyTokensUnauthorized",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 401 senza token', () => pm.response.to.have.status(401));",
+                      "pm.test('success false', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/users/tokens",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["users", "tokens"]
+                }
+              }
+            }
+          ]
+        },
+        {
           "name": "DELETE User",
           "item": [
             {
@@ -724,15 +791,49 @@
                   "script": {
                     "exec": [
                       "pm.test('Status code 200', () => pm.response.to.have.status(200));",
-                      "pm.test('status diventa analyzed', () => {",
+                      "pm.test('status diventa analyzed e token scalati', () => {",
                       "  const body = pm.response.json();",
                       "  pm.expect(body.success).to.be.true;",
                       "  pm.expect(body.data.document.status).to.equal('analyzed');",
+                      "  pm.expect(body.data.tokensRemaining).to.be.a('number');",
+                      "  pm.expect(body.data.tokensRemaining).to.be.at.least(0);",
                       "});",
                       "const body = pm.response.json();",
                       "if (body.data && body.data.reportId) {",
                       "  pm.environment.set('REPORT_ID', body.data.reportId);",
                       "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/documents/{{DOCUMENT_ID}}/analyze",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["documents", "{{DOCUMENT_ID}}", "analyze"]
+                }
+              }
+            },
+            {
+              "name": "AnalyzeDocumentInsufficientTokens",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 402 token insufficienti', () => pm.response.to.have.status(402));",
+                      "pm.test('success false e messaggio token', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.false;",
+                      "  pm.expect(body.error).to.include('token');",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }

@@ -82,3 +82,13 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   await user.destroy();
   ResponseFactory.sendSuccess(res, SuccessEnum.UserDeleted, { message: `${user.email}: Utente eliminato` });
 };
+
+// Restituisce il saldo token dell'utente autenticato
+export const getMyTokens = async (req: Request, res: Response): Promise<void> => {
+  const user = await UserDAO.findById(req.user.id);
+  if (!user) {
+    ResponseFactory.sendError(res, ErrorEnum.UserNotFound);
+    return;
+  }
+  ResponseFactory.sendSuccess(res, SuccessEnum.TokensFetched, { tokens: user.tokens });
+};
