@@ -76,6 +76,7 @@ Le **rotte dei documenti** permettono agli utenti di ottenere ed inviare nuovi d
 |--------|-------|---------------|-------------|
 | `GET` | /documents | Sì | Restituisce la lista dei documenti dell'utente |
 | `GET` | /documents/:id | Sì | Restituisce i dettagli di un singolo documento |
+| `GET` | /documents/:id/file | Sì | Scarica il file PDF originale del documento |
 | `POST` | /documents | Sì | Carica i metadati di un nuovo documento |
 | `PATCH` | /documents/:id | Sì | Modifica i metadati di un documento esistente |
 | `DELETE` | /documents/:id | Sì | Elimina un documento |

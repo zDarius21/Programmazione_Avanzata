@@ -269,11 +269,40 @@ export const deleteDocument = async (req: Request, res: Response): Promise<void>
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentDeleted, { message: `Documento "${document.title}" eliminato` });
 };
 
+// Scarica il file PDF originale di un documento dell'utente autenticato
+export const downloadDocumentFile = async (req: Request, res: Response): Promise<void> => {
+  const document = await DocumentDAO.findByIdAndUser(req.params.id, req.user.id);
+  if (!document) {
+    ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
+    return;
+  }
+
+  if (!document.filePath) {
+    ResponseFactory.sendError(res, ErrorEnum.FileNotAvailable);
+    return;
+  }
+
+  try {
+    const stream = await MinioStorage.getInstance().getObject(MinioStorage.DOCUMENTS_BUCKET, document.filePath);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="document_${document.id}.pdf"`);
+    stream.pipe(res);
+  } catch {
+    ResponseFactory.sendError(res, ErrorEnum.StorageError);
+  }
+};
+
 // Analizza il documento, generando un report PDF su MinIO e aggiornando lo stato
 export const analyzeDocument = async (req: Request, res: Response): Promise<void> => {
   const document = await DocumentDAO.findByIdAndUser(req.params.id, req.user.id);
   if (!document) {
     ResponseFactory.sendError(res, ErrorEnum.DocumentNotFound);
+    return;
+  }
+
+  // Evita di rianalizzare e riscalare i token per un documento già analizzato
+  if (document.status === 'analyzed') {
+    ResponseFactory.sendError(res, ErrorEnum.DocumentAlreadyAnalyzed);
     return;
   }
 

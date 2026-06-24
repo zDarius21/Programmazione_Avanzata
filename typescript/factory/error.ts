@@ -71,6 +71,9 @@ class FileRequired implements ErrorObj {
 class InvalidFileType implements ErrorObj {
   getErrorObj() { return { status: 400, message: ErrorMessages.ERR_INVALID_FILE_TYPE }; }
 }
+class FileNotAvailable implements ErrorObj {
+  getErrorObj() { return { status: 404, message: ErrorMessages.ERR_FILE_NOT_AVAILABLE }; }
+}
 class ReportNotReady implements ErrorObj {
   getErrorObj() { return { status: 409, message: ErrorMessages.ERR_REPORT_NOT_READY }; }
 }
@@ -111,6 +114,7 @@ export enum ErrorEnum {
   RegulationAlreadyExists  = 'RegulationAlreadyExists',
   FileRequired             = 'FileRequired',
   InvalidFileType          = 'InvalidFileType',
+  FileNotAvailable         = 'FileNotAvailable',
   ReportNotReady           = 'ReportNotReady',
   StorageError             = 'StorageError',
   AnalysisNotFound         = 'AnalysisNotFound',
@@ -140,6 +144,7 @@ export function getError(type: ErrorEnum): ErrorObj {
     case ErrorEnum.RegulationAlreadyExists:  return new RegulationAlreadyExists();
     case ErrorEnum.FileRequired:             return new FileRequired();
     case ErrorEnum.InvalidFileType:          return new InvalidFileType();
+    case ErrorEnum.FileNotAvailable:         return new FileNotAvailable();
     case ErrorEnum.ReportNotReady:           return new ReportNotReady();
     case ErrorEnum.StorageError:             return new StorageError();
     case ErrorEnum.AnalysisNotFound:         return new AnalysisNotFound();

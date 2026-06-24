@@ -14,3 +14,7 @@
 /postman/collections
 
 /postman/environments
+
+/docs
+
+typedoc.json

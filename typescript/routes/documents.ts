@@ -8,6 +8,7 @@ import {
   updateDocument,
   deleteDocument,
   analyzeDocument,
+  downloadDocumentFile,
 
 } from '../controllers/documentController';
 
@@ -18,6 +19,7 @@ router.use(authenticate);
 
 router.get('/',            getAllDocuments);
 router.get('/:id',         getDocumentById);
+router.get('/:id/file',    downloadDocumentFile);   // scarica il PDF originale
 router.post('/',  uploadPdf, createDocument);   // accetta opzionalmente un file PDF nel campo "file"
 router.patch('/:id',         updateDocument);
 router.delete('/:id',      deleteDocument);
