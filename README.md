@@ -1,5 +1,23 @@
 # Programmazione Avanzata — Document Compliance Checker
 
+## Indice
+
+| Sezione | Contenuto |
+|--------|-----------|
+| [Obiettivo del Progetto](#obiettivo-del-progetto) | Scopo del backend e funzionalita principali |
+| [Rotte Disponibili](#rotte-disponibili) | Panoramica completa degli endpoint |
+| [Autenticazione](#autenticazione) | Login e registrazione |
+| [Utenti](#utenti) | CRUD utenti e gestione token |
+| [Normative](#normative) | Catalogo normative e operazioni admin |
+| [Documenti](#documenti) | Gestione metadati e avvio analisi |
+| [Analisi](#analisi) | Recupero analisi precedenti |
+| [Report](#report) | Download report generati |
+| [Design Pattern Implementati](#design-pattern-implementati) | Pattern architetturali usati |
+| [Avvio del Servizio](#avvio-del-servizio) | Esecuzione locale con Docker |
+| [Testing](#testing) | Collection Postman ed environment |
+| [Note](#note) | Software e tecnologie usate |
+| [Autore](#autore) | Team e riferimenti GitHub |
+
 ## Obiettivo del Progetto
 Il progetto consiste nell'implementare il backend del progetto realizzato per l'Hack-AI-Thon, volto a verificare la conformità di documenti rispetto a normative ESG.
 Gli utenti autenticati possono caricare i metadati di un documento e richiederne l'analisi: il sistema produce un'`Analysis` con i relativi `ComplianceResult`, esportabile come report.
@@ -103,6 +121,33 @@ Il servizio è disponibile sulla porta **3000** tramite cURL o Postman.
 
 ## Testing
 Importare la collection Postman fornita `postman_collection.json`  e l'environment fornito `postman_environment.json` per eseguire i test predefiniti su tutti gli endpoint. I token JWT sono firmati con chiave RS256.
+
+## Note
+
+### Software Utilizzati
+
+* [Visual Studio Code](https://code.visualstudio.com/) - IDE
+* [Docker](https://www.docker.com/) - Gestore di container
+* [Postman](https://www.postman.com/) - API Testing Platform
+
+### Tecnologie usate
+
+- **Node.js** - Runtime JavaScript
+- **TypeScript** - Linguaggio utilizzato per lo sviluppo
+- **Express** - Framework web per API REST
+- **Sequelize** - ORM per database relazionali
+- **PostgreSQL** - Database relazionale
+- **JWT (RS256) con jsonwebtoken** - Autenticazione e autorizzazione
+- **bcryptjs** - Hashing sicuro delle password
+- **dotenv** - Gestione delle variabili d'ambiente
+- **multer** - Gestione upload multipart/form-data
+- **MinIO (SDK minio)** - Object storage per file e documenti
+- **pdf-parse** - Estrazione contenuto dai PDF
+- **PDFKit** - Generazione report in formato PDF
+- **pg / pg-hstore** - Driver PostgreSQL per Sequelize
+- **express-async-errors** - Gestione errori asincroni in Express
+- **ts-node-dev** - Ambiente di sviluppo con reload automatico
+
 
 ## Autore
 * Dario Tommasi ([Github](https://github.com/zDarius))

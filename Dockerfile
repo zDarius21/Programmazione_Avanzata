@@ -6,17 +6,19 @@ WORKDIR /usr/src/app
 
 # Copia i file di configurazione delle dipendenze e installa i pacchetti Node.js
 COPY package*.json ./
-RUN npm install
+RUN npm install && \
+    addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copia il file di configurazione TypeScript e i sorgenti dell'applicazione
 COPY tsconfig.json ./
 COPY typescript ./typescript
 
 # Compila il codice TypeScript in JavaScript nella cartella "dist"
-RUN npm run build
+RUN npm run build && chown -R appuser:appgroup /usr/src/app
+USER appuser
 
-# Porta su cui il container espone l'applicazione Node.js 
+# Porta su cui il container espone l'applicazione Node.js
 EXPOSE 3000
 
-# Comando di avvio dell'applicazione, eseguendo il file JavaScript compilato 
+# Comando di avvio dell'applicazione, eseguendo il file JavaScript compilato
 CMD ["node", "dist/index.js"]

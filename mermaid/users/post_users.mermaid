@@ -1,0 +1,58 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Router<br/>/users
+    participant Auth as authenticate<br/>(JWT RS256)
+    participant Role as requireAdmin
+    participant Controller as UserController
+    participant DAO as UserDAO
+    participant DB@{ "type": "database" } as Database
+
+    Client->>+Router: POST /users<br/>Authorization: Bearer token<br/>{ email, password }
+
+    rect rgb(255, 240, 240)
+        note over Auth,Role: Chain of Responsibility (middleware)
+        Router->>+Auth: authenticate(req, res, next)
+        alt token mancante o non valido
+            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+        end
+        Auth-->>-Router: req.user
+
+        Router->>+Role: requireAdmin(req, res, next)
+        alt ruolo != admin
+            Role-->>Client: 403 Forbidden<br/>{ error: "Accesso riservato agli admin" }
+        end
+        Role-->>-Router: next()
+    end
+
+    Router->>+Controller: createUser(req, res)
+
+    rect rgb(255, 240, 240)
+        note over Controller: Validazione input
+        alt email o password mancanti
+            Controller-->>Client: 400 Bad Request<br/>{ error: "Email e password richieste" }
+        end
+    end
+
+    Controller->>+DAO: findByEmail(email)
+    DAO->>+DB: SELECT * FROM users<br/>WHERE email = ?
+    DB-->>-DAO: User | null
+    DAO-->>-Controller: User | null
+
+    rect rgb(255, 240, 240)
+        alt email gia in uso
+            Controller-->>Client: 409 Conflict<br/>{ error: "Email gia utilizzata" }
+        end
+    end
+
+    rect rgb(240, 255, 240)
+        note over Controller,DB: Creazione utente
+        Controller->>Controller: bcrypt.hash(password, 10)
+        Controller->>+DAO: create({ email, password: hashed, role: 'user' })
+        DAO->>+DB: INSERT INTO users (...)
+        DB-->>-DAO: User
+        DAO-->>-Controller: User
+    end
+
+    Controller-->>-Router: { id, email, role }
+    Router-->>-Client: 201 Created<br/>{ id, email, role: "user" }

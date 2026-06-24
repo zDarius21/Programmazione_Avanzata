@@ -1,0 +1,71 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Router<br/>/users/:id
+    participant Auth as authenticate<br/>(JWT RS256)
+    participant Role as requireAdmin
+    participant Controller as UserController
+    participant DAO as UserDAO
+    participant DB@{ "type": "database" } as Database
+
+    Client->>+Router: PATCH /users/:id<br/>Authorization: Bearer token<br/>{ email?, password?, role? }
+
+    rect rgb(255, 240, 240)
+        note over Auth,Role: Chain of Responsibility (middleware)
+        Router->>+Auth: authenticate(req, res, next)
+        alt token mancante o non valido
+            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+        end
+        Auth-->>-Router: req.user
+
+        Router->>+Role: requireAdmin(req, res, next)
+        alt ruolo != admin
+            Role-->>Client: 403 Forbidden<br/>{ error: "Accesso riservato agli admin" }
+        end
+        Role-->>-Router: next()
+    end
+
+    Router->>+Controller: updateUser(req, res)
+
+    Controller->>+DAO: findByIdFull(req.params.id)
+    DAO->>+DB: SELECT * FROM users<br/>WHERE id = ?
+    DB-->>-DAO: User | null
+    DAO-->>-Controller: User | null
+
+    rect rgb(255, 240, 240)
+        alt utente non trovato
+            Controller-->>Client: 404 Not Found<br/>{ error: "Utente non trovato" }
+        end
+    end
+
+    rect rgb(240, 240, 255)
+        note over Controller,DB: Aggiornamento campi (solo se presenti)
+        alt email presente
+            Controller->>+DAO: findByEmail(email)
+            DAO->>+DB: SELECT * FROM users<br/>WHERE email = ?
+            DB-->>-DAO: User | null
+            DAO-->>-Controller: User | null
+            alt email gia in uso da altro utente
+                Controller-->>Client: 409 Conflict<br/>{ error: "Email gia in uso" }
+            end
+            Controller->>Controller: user.email = email
+        end
+
+        alt password presente
+            Controller->>Controller: user.password = bcrypt.hash(password, 10)
+        end
+
+        alt role == 'admin' e ruolo attuale == 'user'
+            Controller->>Controller: user.role = 'admin'
+        end
+    end
+
+    rect rgb(240, 255, 240)
+        Controller->>+DAO: user.save()
+        DAO->>+DB: UPDATE users SET ...<br/>WHERE id = ?
+        DB-->>-DAO: User
+        DAO-->>-Controller: User
+    end
+
+    Controller-->>-Router: { id, email, role }
+    Router-->>-Client: 200 OK<br/>{ id, email, role }

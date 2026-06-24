@@ -1,0 +1,47 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Router<br/>/auth/register
+    participant Controller as AuthController
+    participant DAO as UserDAO
+    participant DB@{ "type": "database" } as Database
+    participant JWT as JWT (RS256)
+
+    Client->>+Router: POST /auth/register<br/>{ email, password, role? }
+
+    Router->>+Controller: register(req, res)
+
+    rect rgb(255, 240, 240)
+        note over Controller: Validazione input
+        alt email o password mancanti
+            Controller-->>Client: 400 Bad Request<br/>{ error: "Credenziali mancanti" }
+        end
+    end
+
+    Controller->>+DAO: findByEmail(email)
+    DAO->>+DB: SELECT * FROM users<br/>WHERE email = ?
+    DB-->>-DAO: User | null
+    DAO-->>-Controller: User | null
+
+    rect rgb(255, 240, 240)
+        alt email gia registrata
+            Controller-->>Client: 409 Conflict<br/>{ error: "Email gia registrata" }
+        end
+    end
+
+    rect rgb(240, 255, 240)
+        note over Controller,DB: Creazione utente
+        Controller->>+JWT: bcrypt.hash(password, 10)
+        JWT-->>-Controller: hashedPassword
+
+        Controller->>+DAO: create({ email, password: hashed,<br/>role: role === 'admin' ? 'admin' : 'user' })
+        DAO->>+DB: INSERT INTO users (...)
+        DB-->>-DAO: User
+        DAO-->>-Controller: User
+
+        Controller->>+JWT: jwt.sign({ id, email, role },<br/>privateKey, { algorithm: RS256,<br/>expiresIn: JWT_EXPIRES_IN })
+        JWT-->>-Controller: accessToken
+    end
+
+    Controller-->>-Router: { token, role }
+    Router-->>-Client: 201 Created<br/>{ token: "eyJ...", role: "..." }
