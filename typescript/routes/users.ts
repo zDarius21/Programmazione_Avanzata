@@ -8,6 +8,7 @@ import {
   updateUser,
   deleteUser,
   getMyTokens,
+  rechargeTokens,
 } from '../controllers/userController';
 
 const router = Router();
@@ -23,5 +24,6 @@ router.get('/:id', getUserById);
 router.post('/', createUser);
 router.patch('/:id', updateUser);
 router.delete('/:id', deleteUser);
+router.post('/:id/tokens', rechargeTokens);
 
 export default router;

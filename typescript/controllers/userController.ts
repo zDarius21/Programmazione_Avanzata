@@ -92,3 +92,30 @@ export const getMyTokens = async (req: Request, res: Response): Promise<void> =>
   }
   ResponseFactory.sendSuccess(res, SuccessEnum.TokensFetched, { tokens: user.tokens });
 };
+
+// Ricarica manuale dei token di un utente (solo admin). Il valore viene aggiunto al saldo attuale fino al cap di 200.
+export const rechargeTokens = async (req: Request, res: Response): Promise<void> => {
+  const amount = Number(req.body.tokens);
+  if (!Number.isInteger(amount) || amount <= 0 || amount > 100) {
+    ResponseFactory.sendError(res, ErrorEnum.InvalidTokenAmount);
+    return;
+  }
+
+  const user = await UserDAO.findById(req.params.id);
+  if (!user) {
+    ResponseFactory.sendError(res, ErrorEnum.UserNotFound);
+    return;
+  }
+
+  if (user.tokens + amount > 100) {
+    ResponseFactory.sendError(res, ErrorEnum.TokenCapExceeded);
+    return;
+  }
+
+  const newBalance = await UserDAO.addTokens(Number(req.params.id), amount);
+  ResponseFactory.sendSuccess(res, SuccessEnum.TokensRecharged, {
+    id: user.id,
+    email: user.email,
+    tokens: newBalance,
+  });
+};

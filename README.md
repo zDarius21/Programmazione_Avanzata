@@ -40,6 +40,9 @@ Le **rotte di autenticazione** permettono all'utente di registrarsi e di effettu
 |--------|-------|---------------|-------------|
 | `POST` | /auth/register | No | Registra un nuovo utente e restituisce un token JWT |
 | `POST` | /auth/login | No | Verifica le credenziali e restituisce un token JWT |
+| `GET` | /auth/me | Si | Restituisce all'utente le proprie informazioni |
+| `PATCH` | /auth/me | Si | Permette all'utente di modificare le proprie informazioni |
+
 
 ### Utenti 
 
@@ -53,6 +56,7 @@ Le **rotte relative agli utenti** permettono all'**admin** di effettuare operazi
 | `PATCH` | /users/:id | Sì (admin) | Modifica i dati di un utente esistente |
 | `DELETE` | /users/:id | Sì (admin) | Elimina un utente |
 | `GET` | /users/token | Sì | Restituisce il numero di token rimanenti all'utente |
+| `POST` | /users/:id/token | Sì (admin) | Permette all'admin di aggiungere token ad un utente |
 
 
 

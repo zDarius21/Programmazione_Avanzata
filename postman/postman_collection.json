@@ -114,7 +114,9 @@
                       "  pm.expect(body.data).to.have.property('role');",
                       "  pm.expect(body.data).to.have.property('tokens');",
                       "  pm.expect(body.data).to.not.have.property('password');",
-                      "  pm.environment.set('USER_ID', body.data.id);",
+                      "  if (body.data.role !== 'admin') {",
+                      "    pm.environment.set('USER_ID', body.data.id);",
+                      "  }",
                       "});"
                     ],
                     "type": "text/javascript"
@@ -450,6 +452,51 @@
                   "host": ["{{HOST}}"],
                   "port": "{{PORT}}",
                   "path": ["users", "tokens"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /users/:id/tokens",
+          "item": [
+            {
+              "name": "RechargeTokensSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('token ricaricati: saldo aggiornato restituito', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data).to.have.property('id');",
+                      "  pm.expect(body.data).to.have.property('email');",
+                      "  pm.expect(body.data.tokens).to.be.a('number');",
+                      "  pm.expect(body.data.tokens).to.be.at.least(50);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tokens\": 50\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/users/{{USER_ID}}/tokens",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["users", "{{USER_ID}}", "tokens"]
                 }
               }
             }

@@ -81,6 +81,19 @@ class UserDAO implements IDao<User, UserCreateData> {
       { replacements: { amount, cap } }
     );
   }
+
+  async addTokens(userId: number, amount: number, cap: number = 100): Promise<number> {
+    try {
+      const user = await User.findByPk(userId);
+      if (!user) throw new AppError(ErrorEnum.UserNotFound);
+      user.tokens = Math.min(user.tokens + amount, cap);
+      await user.save();
+      return user.tokens;
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      throw new AppError(ErrorEnum.DatabaseError);
+    }
+  }
 }
 
 export default new UserDAO();
