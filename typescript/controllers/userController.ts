@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import UserDAO from '../dao/UserDAO';
+import DocumentDAO from '../dao/DocumentDAO';
+import MinioStorage from '../singleton/minio';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 
 // Implementazione della rotta /users di tipo "GET". Si restituiscono le informazioni sicure di tutti gli utenti
@@ -77,6 +79,15 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   if (!user) {
     ResponseFactory.sendError(res, ErrorEnum.UserNotFound);
     return;
+  }
+
+  // Le righe di documenti e report vengono eliminate a cascata dal DB (ON DELETE CASCADE),
+  // ma i relativi file su MinIO vanno rimossi esplicitamente per non lasciare oggetti orfani.
+  const documents = await DocumentDAO.findAllByUser(user.id);
+  const client = MinioStorage.getInstance();
+  for (const document of documents) {
+    if (document.filePath)   await client.removeObject(MinioStorage.DOCUMENTS_BUCKET, document.filePath).catch(() => {});
+    if (document.reportPath) await client.removeObject(MinioStorage.REPORTS_BUCKET,   document.reportPath).catch(() => {});
   }
 
   await user.destroy();
