@@ -94,6 +94,91 @@
               }
             }
           ]
+        },
+        {
+          "name": "GET /auth/me",
+          "item": [
+            {
+              "name": "GetMeSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('profilo restituito senza password', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data).to.have.property('id');",
+                      "  pm.expect(body.data).to.have.property('email');",
+                      "  pm.expect(body.data).to.have.property('role');",
+                      "  pm.expect(body.data).to.have.property('tokens');",
+                      "  pm.expect(body.data).to.not.have.property('password');",
+                      "  pm.environment.set('USER_ID', body.data.id);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/auth/me",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["auth", "me"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /auth/me",
+          "item": [
+            {
+              "name": "UpdateMeSuccess",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code 200', () => pm.response.to.have.status(200));",
+                      "pm.test('email e password aggiornate insieme', () => {",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.success).to.be.true;",
+                      "  pm.expect(body.data.email).to.equal('utente_finale@test.com');",
+                      "  pm.expect(body.data).to.not.have.property('password');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{JWT_TOKEN}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"utente_finale@test.com\",\n  \"password\": \"AltroPassword456!\"\n}"
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/auth/me",
+                  "protocol": "http",
+                  "host": ["{{HOST}}"],
+                  "port": "{{PORT}}",
+                  "path": ["auth", "me"]
+                }
+              }
+            }
+          ]
         }
       ]
     },

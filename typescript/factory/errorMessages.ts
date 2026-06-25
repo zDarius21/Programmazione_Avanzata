@@ -24,4 +24,5 @@ export const ERR_ANALYSIS_NOT_FOUND          = 'Analisi non trovata';
 export const ERR_REPORT_NOT_FOUND            = 'Report non trovato';
 export const ERR_INSUFFICIENT_TOKENS         = 'Token insufficienti per eseguire l\'analisi (necessari 10 token)';
 export const ERR_DATABASE_ERROR              = 'Errore durante l\'operazione sul database';
+export const ERR_NOTHING_TO_UPDATE          = 'Nessun campo da aggiornare: fornire almeno email o password';
 

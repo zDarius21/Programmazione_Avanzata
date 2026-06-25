@@ -74,6 +74,12 @@ class AnalysisFetched implements SuccessObj {
 class TokensFetched implements SuccessObj {
   getSuccessObj() { return { status: 200 }; }
 }
+class ProfileFetched implements SuccessObj {
+  getSuccessObj() { return { status: 200 }; }
+}
+class ProfileUpdated implements SuccessObj {
+  getSuccessObj() { return { status: 200 }; }
+}
 
 // Enum con tutti i tipi di risposta di successo
 export enum SuccessEnum {
@@ -98,6 +104,8 @@ export enum SuccessEnum {
   AnalysesFetched    = 'AnalysesFetched',
   AnalysisFetched    = 'AnalysisFetched',
   TokensFetched      = 'TokensFetched',
+  ProfileFetched     = 'ProfileFetched',
+  ProfileUpdated     = 'ProfileUpdated',
 }
 
 // Funzione che riceve il tipo di enum di successo e restituisce l'istanza della classe corrispondente
@@ -124,5 +132,7 @@ export function getSuccess(type: SuccessEnum): SuccessObj {
     case SuccessEnum.AnalysesFetched:    return new AnalysesFetched();
     case SuccessEnum.AnalysisFetched:    return new AnalysisFetched();
     case SuccessEnum.TokensFetched:      return new TokensFetched();
+    case SuccessEnum.ProfileFetched:     return new ProfileFetched();
+    case SuccessEnum.ProfileUpdated:     return new ProfileUpdated();
   }
 }

@@ -93,6 +93,9 @@ class InsufficientTokens implements ErrorObj {
 class DatabaseError implements ErrorObj {
   getErrorObj() { return { status: 500, message: ErrorMessages.ERR_DATABASE_ERROR }; }
 }
+class NothingToUpdate implements ErrorObj {
+  getErrorObj() { return { status: 400, message: ErrorMessages.ERR_NOTHING_TO_UPDATE }; }
+}
 
 // Enum con tutti i tipi di errore
 export enum ErrorEnum {
@@ -121,6 +124,7 @@ export enum ErrorEnum {
   ReportNotFound           = 'ReportNotFound',
   InsufficientTokens       = 'InsufficientTokens',
   DatabaseError            = 'DatabaseError',
+  NothingToUpdate          = 'NothingToUpdate',
 }
 
 // Funzione che riceve il tipo di enum di errore e restituisce l'istanza della classe corrispondente
@@ -151,6 +155,7 @@ export function getError(type: ErrorEnum): ErrorObj {
     case ErrorEnum.ReportNotFound:           return new ReportNotFound();
     case ErrorEnum.InsufficientTokens:       return new InsufficientTokens();
     case ErrorEnum.DatabaseError:            return new DatabaseError();
+    case ErrorEnum.NothingToUpdate:          return new NothingToUpdate();
     default: throw new Error(`Errore sconosciuto: ${type}`);
   }
 }

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import UserDAO from '../dao/UserDAO';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 
 // La chiave privata letta dal file indicato nel .env
@@ -66,4 +67,46 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   });
 
   ResponseFactory.sendSuccess(res, SuccessEnum.UserLoggedIn, { token, role: user.role });
+};
+
+// Restituisce il profilo dell'utente autenticato 
+export const getMe = async (req: Request, res: Response): Promise<void> => {
+  const user = await UserDAO.findById(req.user.id);
+  if (!user) {
+    ResponseFactory.sendError(res, ErrorEnum.UserNotFound);
+    return;
+  }
+  ResponseFactory.sendSuccess(res, SuccessEnum.ProfileFetched, user);
+};
+
+// Aggiorna email e password dell'utente autenticato
+export const updateMe = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+
+  if (email === undefined && password === undefined) {
+    ResponseFactory.sendError(res, ErrorEnum.NothingToUpdate);
+    return;
+  }
+
+  const user = await UserDAO.findByIdFull(req.user.id);
+  if (!user) {
+    ResponseFactory.sendError(res, ErrorEnum.UserNotFound);
+    return;
+  }
+
+  if (email !== undefined) {
+    const conflict = await UserDAO.findByEmail(email);
+    if (conflict && conflict.id !== user.id) {
+      ResponseFactory.sendError(res, ErrorEnum.EmailInUse);
+      return;
+    }
+    user.email = email;
+  }
+
+  if (password !== undefined) {
+    user.password = await bcrypt.hash(password, 10);
+  }
+
+  await user.save();
+  ResponseFactory.sendSuccess(res, SuccessEnum.ProfileUpdated, { id: user.id, email: user.email, role: user.role });
 };
