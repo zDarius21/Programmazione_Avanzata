@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { AppError } from './factory/error';
 import Database from './singleton/database';
 import MinioStorage from './singleton/minio';
+import './models/associations'; 
 import UserDAO from './dao/UserDAO';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
