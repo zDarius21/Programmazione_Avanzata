@@ -16,6 +16,7 @@ interface DocumentAttributes {
 }
 
 // In fase di creazione: id è auto-generato, status ha default 'pending', i path sono opzionali
+
 interface DocumentCreationAttributes extends Optional<DocumentAttributes, 'id' | 'status' | 'filePath' | 'reportPath'> {}
 
 class Document extends Model<DocumentAttributes, DocumentCreationAttributes> implements DocumentAttributes {
