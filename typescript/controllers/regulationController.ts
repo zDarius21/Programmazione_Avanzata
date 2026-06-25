@@ -3,13 +3,21 @@ import { PDFParse } from 'pdf-parse';
 import RegulationDAO from '../dao/RegulationDAO';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 
-// Restituisce la lista di tutte le normative presenti
+/**
+ * Restituisce la lista di tutte le normative presenti
+ * @param req La richiesta HTTP
+ * @param res La risposta HTTP
+ */
 export const getAllRegulations = async (req: Request, res: Response): Promise<void> => {
   const regulations = await RegulationDAO.findAll();
   ResponseFactory.sendSuccess(res, SuccessEnum.RegulationsFetched, regulations);
 };
 
-// Restituisce i dettagli di una singola normativa ricercandola per id
+/**
+ * Restituisce i dettagli di una singola normativa ricercandola per id
+ * @param req La richiesta HTTP contenente l'ID della normativa
+ * @param res La risposta HTTP
+ */
 export const getRegulationById = async (req: Request, res: Response): Promise<void> => {
   const regulation = await RegulationDAO.findById(req.params.id);
   if (!regulation) {
@@ -19,7 +27,12 @@ export const getRegulationById = async (req: Request, res: Response): Promise<vo
   ResponseFactory.sendSuccess(res, SuccessEnum.RegulationFetched, regulation);
 };
 
-// Crea una nuova normativa. Se viene allegato un PDF, il testo estratto sostituisce la description
+/**
+ * Crea una nuova normativa. Se viene allegato un PDF, il testo estratto sostituisce la description
+ * @param req La richiesta HTTP contenente i dati della normativa e opzionalmente un file PDF
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const createRegulation = async (req: Request, res: Response): Promise<void> => {
   const { name, version } = req.body;
   let { description } = req.body;
@@ -45,7 +58,12 @@ export const createRegulation = async (req: Request, res: Response): Promise<voi
   ResponseFactory.sendSuccess(res, SuccessEnum.RegulationCreated, regulation);
 };
 
-// Aggiorna una normativa esistente, controllando che esista la normativa e che i campi siano compilati
+/**
+ * Aggiorna una normativa esistente, controllando che esista la normativa e che i campi siano compilati
+ * @param req La richiesta HTTP contenente i dati aggiornati della normativa
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const updateRegulation = async (req: Request, res: Response): Promise<void> => {
   const regulation = await RegulationDAO.findById(req.params.id);
   if (!regulation) {
@@ -58,7 +76,12 @@ export const updateRegulation = async (req: Request, res: Response): Promise<voi
   ResponseFactory.sendSuccess(res, SuccessEnum.RegulationUpdated, regulation);
 };
 
-// Elimina una normativa, controllando che esista la normativa e restituendo un messaggio di conferma
+/**
+ * Elimina una normativa, controllando che esista la normativa e restituendo un messaggio di conferma
+ * @param req La richiesta HTTP contenente l'ID della normativa
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const deleteRegulation = async (req: Request, res: Response): Promise<void> => {
   const regulation = await RegulationDAO.findById(req.params.id);
   if (!regulation) {

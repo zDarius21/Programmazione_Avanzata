@@ -4,7 +4,10 @@ import { AppError, ErrorEnum } from '../factory/error';
 
 type DocumentCreateData = { userId: number; title: string; description: string };
 
-// DAO per le operazioni di accesso ai dati dei documenti
+/**
+ * DAO per le operazioni di accesso ai dati dei documenti
+ * @param  - Il modello del documento
+ */
 class DocumentDAO implements IDao<Document, DocumentCreateData> {
   /** Restituisce tutti i documenti presenti nel database. */
   async findAll() {

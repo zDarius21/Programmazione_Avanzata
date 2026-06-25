@@ -5,13 +5,23 @@ import DocumentDAO from '../dao/DocumentDAO';
 import MinioStorage from '../singleton/minio';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 
-// Implementazione della rotta /users di tipo "GET". Si restituiscono le informazioni sicure di tutti gli utenti
+/**
+ * Implementazione della rotta /users di tipo "GET". Si restituiscono le informazioni sicure di tutti gli utenti
+ * @param _req La richiesta HTTP
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
   const users = await UserDAO.findAll();
   ResponseFactory.sendSuccess(res, SuccessEnum.UsersFetched, users);
 };
 
-// Implementazione della rotta /users/:id di tipo "GET". Si restituiscono le informazioni sicure di un singolo utente, scegliendolo in base all'ID
+/**
+ * Implementazione della rotta /users/:id di tipo "GET". Si restituiscono le informazioni sicure di un singolo utente, scegliendolo in base all'ID
+ * @param req La richiesta HTTP contenente l'ID dell'utente
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const getUserById = async (req: Request, res: Response): Promise<void> => {
   const user = await UserDAO.findById(req.params.id);
   if (!user) {
@@ -21,7 +31,12 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
   ResponseFactory.sendSuccess(res, SuccessEnum.UserFetched, user);
 };
 
-// Implementazione della rotta /users di tipo "POST". Si crea un nuovo utente impostando email e password hashata. Il ruolo è impostato di default a "user"
+/**
+ * Implementazione della rotta /users di tipo "POST". Si crea un nuovo utente impostando email e password hashata. Il ruolo è impostato di default a "user"
+ * @param req La richiesta HTTP contenente i dati del nuovo utente
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -42,7 +57,13 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
   ResponseFactory.sendSuccess(res, SuccessEnum.UserCreated, { id: user.id, email: user.email, role: user.role });
 };
 
-// Implementazione della rotta /users/:id di tipo "PUT". Si aggiornano email, password dell'utente. Si può modificare il ruolo di un utente soltanto se il ruolo attuale è "user".
+
+/**
+ * Implementazione della rotta /users/:id di tipo "PUT". Si aggiornano email, password dell'utente. Si può modificare il ruolo di un utente soltanto se il ruolo attuale è "user".
+ * @param req La richiesta HTTP contenente i dati aggiornati dell'utente
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   const user = await UserDAO.findByIdFull(req.params.id);
   if (!user) {
@@ -73,7 +94,12 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
   ResponseFactory.sendSuccess(res, SuccessEnum.UserUpdated, { id: user.id, email: user.email, role: user.role });
 };
 
-// Implementazione della rotta /users/:id di tipo "DELETE". Si elimina un utente selezionandolo in base all'ID
+/**
+ * Implementazione della rotta /users/:id di tipo "DELETE". Si elimina un utente selezionandolo in base all'ID
+ * @param req La richiesta HTTP contenente l'ID dell'utente
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   const user = await UserDAO.findByIdFull(req.params.id);
   if (!user) {
@@ -94,7 +120,12 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   ResponseFactory.sendSuccess(res, SuccessEnum.UserDeleted, { message: `${user.email}: Utente eliminato` });
 };
 
-// Restituisce il saldo token dell'utente autenticato
+/**
+ * Implementazione della rotta /users/me/tokens di tipo "GET". Si restituisce il saldo token dell'utente autenticato
+ * @param req La richiesta HTTP
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const getMyTokens = async (req: Request, res: Response): Promise<void> => {
   const user = await UserDAO.findById(req.user.id);
   if (!user) {
@@ -104,7 +135,12 @@ export const getMyTokens = async (req: Request, res: Response): Promise<void> =>
   ResponseFactory.sendSuccess(res, SuccessEnum.TokensFetched, { tokens: user.tokens });
 };
 
-// Ricarica manuale dei token di un utente (solo admin). Il valore viene aggiunto al saldo attuale fino al cap di 200.
+/**
+ * Implementazione della rotta /users/:id/tokens di tipo "POST". Si ricaricano manualmente i token di un utente (solo admin). Il valore viene aggiunto al saldo attuale fino al cap di 100.
+ * @param req La richiesta HTTP contenente l'ID dell'utente e il numero di token da ricaricare
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const rechargeTokens = async (req: Request, res: Response): Promise<void> => {
   const amount = Number(req.body.tokens);
   if (!Number.isInteger(amount) || amount <= 0 || amount > 100) {

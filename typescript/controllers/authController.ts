@@ -10,7 +10,12 @@ import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFact
 const PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_PATH ?? '', 'utf8');
 const JWT_EXPIRY = (process.env.JWT_EXPIRES_IN ?? '1h') as jwt.SignOptions['expiresIn'];
 
-// Registra un nuovo utente, salva la password hashata e restituisce un token JWT
+/**
+ * Registra un nuovo utente, salva la password hashata e restituisce un token JWT
+ * @param req La richiesta HTTP contenente email e password
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -39,7 +44,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   ResponseFactory.sendSuccess(res, SuccessEnum.UserRegistered, { token, role: user.role });
 };
 
-// Verifica le credenziali e restituisce un token JWT se corrette
+/**
+ * Verifica le credenziali e restituisce un token JWT se corrette
+ * @param req La richiesta HTTP contenente email e password
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -69,7 +79,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   ResponseFactory.sendSuccess(res, SuccessEnum.UserLoggedIn, { token, role: user.role });
 };
 
-// Restituisce il profilo dell'utente autenticato 
+/**
+ * Restituisce il profilo dell'utente autenticato
+ * @param req La richiesta HTTP
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const getMe = async (req: Request, res: Response): Promise<void> => {
   const user = await UserDAO.findById(req.user.id);
   if (!user) {
@@ -79,7 +94,12 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
   ResponseFactory.sendSuccess(res, SuccessEnum.ProfileFetched, user);
 };
 
-// Aggiorna email e password dell'utente autenticato
+/**
+ * Aggiorna email e password dell'utente autenticato
+ * @param req La richiesta HTTP contenente email e/o password
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const updateMe = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 

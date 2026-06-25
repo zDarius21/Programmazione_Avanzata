@@ -71,10 +71,19 @@ class UserDAO implements IDao<User, UserCreateData> {
     }
   }
 
+  /**
+   * Decrementa il numero di token dell'utente con l'id fornito di 10 token.
+   * @param userId - L'id dell'utente.
+   * @param amount - L'ammontare di token da decrementare.
+   */
   async deductTokens(userId: number, amount: number = 10): Promise<void> {
     await User.decrement('tokens', { by: amount, where: { id: userId } });
   }
-
+  /**
+   * Ricarica i token degli utenti fino a un massimo specificato, lanciato in automatico, impostato per aggiungere 10 token ogni 6 ore.
+   * @param amount - L'ammontare di token da aggiungere.
+   * @param cap - Il numero massimo di token consentito.
+   */
   async refillTokens(amount: number = 10, cap: number = 100): Promise<void> {
     await User.sequelize?.query(
       `UPDATE users SET tokens = LEAST(tokens + :amount, :cap)`,
@@ -82,6 +91,14 @@ class UserDAO implements IDao<User, UserCreateData> {
     );
   }
 
+ /**
+  * Aggiunge token all'utente con l'id fornito fino a un massimo specificato.
+  * @param userId - L'id dell'utente.
+  * @param amount - L'ammontare di token da aggiungere.
+  * @param cap - Il numero massimo di token consentito.
+  * @returns Restituisce il numero aggiornato di token dell'utente.
+
+  */
   async addTokens(userId: number, amount: number, cap: number = 100): Promise<number> {
     try {
       const user = await User.findByPk(userId);

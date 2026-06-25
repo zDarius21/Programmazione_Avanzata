@@ -3,7 +3,12 @@ import ReportDAO from '../dao/ReportDAO';
 import MinioStorage from '../singleton/minio';
 import ResponseFactory, { ErrorEnum } from '../factory/responseFactory';
 
-// Scarica il report PDF identificato dal proprio ID
+/**
+ * Scarica il report PDF identificato dal proprio ID
+ * @param req La richiesta HTTP contenente l'ID del report
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia il file tramite la risposta HTTP
+ */
 export const downloadReport = async (req: Request, res: Response): Promise<void> => {
   const report = await ReportDAO.findByIdAndUser(req.params.id, req.user.id);
 

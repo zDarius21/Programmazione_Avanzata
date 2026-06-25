@@ -6,8 +6,11 @@ import ReportDAO from '../dao/ReportDAO';
 import UserDAO from '../dao/UserDAO';
 import MinioStorage from '../singleton/minio';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
-
-// Genera il PDF del report dopo aver analizzato il documento
+/**
+ * Funzione che genera un report PDF per un documento analizzato, basandosi sui dati del modello Document.
+ * @param docModel Modello del documento da analizzare
+ * @returns Una promessa che risolve in un buffer contenente il PDF generato
+ */
 function generateReport(docModel: Document): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
     const PAGE_W = 595.28;
@@ -188,14 +191,21 @@ function generateReport(docModel: Document): Promise<Buffer> {
     pdf.end();
   });
 }
-
-// Restituisce solo i documenti dell'utente autenticato
+/**
+ * Restituisce tutti i documenti dell'utente autenticato
+ * @param req La richiesta HTTP
+ * @param res La risposta HTTP
+ */
 export const getAllDocuments = async (req: Request, res: Response): Promise<void> => {
   const documents = await DocumentDAO.findAllByUser(req.user.id);
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentsFetched, documents);
 };
 
-// Restituisce un singolo documento dell'utente autenticato
+/**
+ * Restituisce un singolo documento dell'utente autenticato
+ * @param req La richiesta HTTP contenente l'ID del documento
+ * @param res La risposta HTTP
+ */
 export const getDocumentById = async (req: Request, res: Response): Promise<void> => {
   const document = await DocumentDAO.findByIdAndUser(req.params.id, req.user.id);
   if (!document) {
@@ -205,7 +215,11 @@ export const getDocumentById = async (req: Request, res: Response): Promise<void
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentFetched, document);
 };
 
-// Crea un nuovo documento PDF e lo carica su MinIO
+/**
+ * Crea un nuovo documento PDF e lo carica su MinIO
+ * @param req La richiesta HTTP contenente titolo, descrizione e file PDF
+ * @param res La risposta HTTP
+ */
 export const createDocument = async (req: Request, res: Response): Promise<void> => {
   const { title, description } = req.body;
 
@@ -240,7 +254,11 @@ export const createDocument = async (req: Request, res: Response): Promise<void>
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentCreated, document);
 };
 
-// Aggiorna titolo o descrizione di un documento dell'utente autenticato
+/**
+ * Aggiorna titolo o descrizione di un documento dell'utente autenticato
+ * @param req La richiesta HTTP contenente titolo e/o descrizione
+ * @param res La risposta HTTP
+ */
 export const updateDocument = async (req: Request, res: Response): Promise<void> => {
   const document = await DocumentDAO.findByIdAndUser(req.params.id, req.user.id);
   if (!document) {
@@ -253,7 +271,11 @@ export const updateDocument = async (req: Request, res: Response): Promise<void>
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentUpdated, document);
 };
 
-// Elimina un documento e i rispettivi file su MinIO
+/**
+ * Elimina un documento e i rispettivi file su MinIO
+ * @param req La richiesta HTTP contenente l'ID del documento
+ * @param res La risposta HTTP
+ */
 export const deleteDocument = async (req: Request, res: Response): Promise<void> => {
   const document = await DocumentDAO.findByIdAndUser(req.params.id, req.user.id);
   if (!document) {
@@ -269,7 +291,12 @@ export const deleteDocument = async (req: Request, res: Response): Promise<void>
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentDeleted, { message: `Documento "${document.title}" eliminato` });
 };
 
-// Scarica il file PDF originale di un documento dell'utente autenticato
+/**
+ * Scarica il file PDF originale di un documento dell'utente autenticato
+ * @param req La richiesta HTTP contenente l'ID del documento
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia il file tramite la risposta HTTP
+ */
 export const downloadDocumentFile = async (req: Request, res: Response): Promise<void> => {
   const document = await DocumentDAO.findByIdAndUser(req.params.id, req.user.id);
   if (!document) {
@@ -292,7 +319,12 @@ export const downloadDocumentFile = async (req: Request, res: Response): Promise
   }
 };
 
-// Analizza il documento, generando un report PDF su MinIO e aggiornando lo stato
+/**
+ * Analizza il documento, generando un report PDF su MinIO e aggiornando lo stato
+ * @param req La richiesta HTTP contenente l'ID del documento
+ * @param res La risposta HTTP
+ * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
+ */
 export const analyzeDocument = async (req: Request, res: Response): Promise<void> => {
   const document = await DocumentDAO.findByIdAndUser(req.params.id, req.user.id);
   if (!document) {
