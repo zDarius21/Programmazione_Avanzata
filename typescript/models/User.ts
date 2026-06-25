@@ -21,7 +21,12 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   declare tokens: number;
 }
 
-// Definizione della tabella e dei tipi delle colonne
+
+/**
+ * Inizializza il modello User con i suoi attributi e le opzioni di configurazione.
+ * @param sequelize L'istanza di Sequelize da utilizzare per la connessione al database.
+ * @returns void
+ */
 User.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },

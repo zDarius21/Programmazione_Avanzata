@@ -2,7 +2,10 @@ import multer from 'multer';
 import { Request, Response, NextFunction } from 'express';
 import ResponseFactory, { ErrorEnum } from '../factory/responseFactory';
 
-// Configurazione del multer per accettare soltanto file PDF per un massimo di 10MB. Non viene salvato su disco, ma tenuto su RAM tramite memoryStorage
+/**
+ * Configurazione del multer per accettare soltanto file PDF per un massimo di 10MB.
+ * Non viene salvato su disco, ma tenuto su RAM tramite memoryStorage.
+ */
 const multerInstance = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },

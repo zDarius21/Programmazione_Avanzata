@@ -4,8 +4,11 @@ import { Sequelize } from 'sequelize';
 class Database {
   private static instance: Sequelize;
 
+  /**
+   * Crea o restituisce l'istanza singleton di Sequelize per la connessione al database.
+   * @returns L'istanza singleton di Sequelize.
+   */
   static getInstance(): Sequelize {
-    // Crea la connessione solo la prima volta che viene richiesta
     if (!Database.instance) {
       Database.instance = new Sequelize({
         dialect: 'postgres',

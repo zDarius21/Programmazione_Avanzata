@@ -19,7 +19,11 @@ class Regulation extends Model<RegulationAttributes, RegulationCreationAttribute
   declare version: string;
 }
 
-// Definizione della tabella e dei tipi delle colonne
+/**
+ * Inizializza il modello Regulation con i suoi attributi e le opzioni di configurazione.
+ * @param sequelize L'istanza di Sequelize da utilizzare per la connessione al database.
+ */
+ 
 Regulation.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },

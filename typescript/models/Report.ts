@@ -19,6 +19,10 @@ class Report extends Model<ReportAttributes, ReportCreationAttributes> implement
   declare filePath: string;
 }
 
+/**
+ * Inizializza il modello Report con i suoi attributi e le opzioni di configurazione.
+ * @param sequelize L'istanza di Sequelize da utilizzare per la connessione al database.
+ */
 Report.init(
   {
     id:         { type: DataTypes.INTEGER,      autoIncrement: true, primaryKey: true },

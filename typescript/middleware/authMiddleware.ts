@@ -6,7 +6,11 @@ import ResponseFactory, { ErrorEnum } from '../factory/responseFactory';
 // La chiave pubblica viene usata per verificare la firma dei token in entrata
 const PUBLIC_KEY = fs.readFileSync(process.env.JWT_PUBLIC_KEY_PATH ?? '', 'utf8');
 
-// Struttura del payload decodificato dal token JWT
+
+/**
+ * Interfaccia che rappresenta il payload del token JWT decodificato.
+ * Contiene le informazioni dell'utente che sono state codificate nel token.
+ */
 export interface AuthPayload {
   id: number;
   email: string;
@@ -22,7 +26,16 @@ declare global {
   }
 }
 
-// Middleware che verifica la presenza e la validità del token Bearer
+
+/**
+ * Middleware che verifica la presenza e la validità del token Bearer.
+ * Se il token è valido, aggiunge il payload decodificato a req.user.
+ * 
+ * @param req La richiesta HTTP
+ * @param res La risposta HTTP
+ * @param next La funzione per passare al prossimo middleware
+ * @returns void
+ */
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 

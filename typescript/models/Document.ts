@@ -29,6 +29,10 @@ class Document extends Model<DocumentAttributes, DocumentCreationAttributes> imp
   declare reportPath: string | null;
 }
 
+/**
+ * Inizializza il modello Document con i suoi attributi e le opzioni di configurazione.
+ * @param sequelize L'istanza di Sequelize da utilizzare per la connessione al database.
+ */
 Document.init(
   {
     id:          { type: DataTypes.INTEGER,                           autoIncrement: true, primaryKey: true },
