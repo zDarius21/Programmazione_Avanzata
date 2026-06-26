@@ -332,18 +332,20 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
     return;
   }
 
-  // Evita di rianalizzare e riscalare i token per un documento già analizzato
+  // Evita di rianalizzare e riscalare i token per un documento già analizzato  
+  // METTERE ENUMERATIVO
   if (document.status === 'analyzed') {
     ResponseFactory.sendError(res, ErrorEnum.DocumentAlreadyAnalyzed);
     return;
   }
-
+//METTERE 10 COME CONST
   const user = await UserDAO.findByIdFull(req.user.id);
   if (!user || user.tokens < 10) {
     ResponseFactory.sendError(res, ErrorEnum.InsufficientTokens);
     return;
   }
 
+  //INSERIRE ALL'INTERNO DI UNA TRANSAZIONE MANAGE
   const reportKey = `${document.id}/report.pdf`;
   try {
     const pdfBuffer = await generateReport(document);

@@ -18,3 +18,5 @@
 /docs
 
 typedoc.json
+
+package-lock.json
