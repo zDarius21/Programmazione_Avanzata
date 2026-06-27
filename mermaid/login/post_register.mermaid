@@ -2,21 +2,24 @@ sequenceDiagram
     autonumber
     actor Client
     participant Router as Router<br/>/auth/register
+    participant Validate as validate<br/>(Zod Middleware)
     participant Controller as AuthController
     participant DAO as UserDAO
     participant DB@{ "type": "database" } as Database
     participant JWT as JWT (RS256)
 
-    Client->>+Router: POST /auth/register<br/>{ email, password, role? }
+    Client->>+Router: POST /auth/register<br/>{ email, password }
 
-    Router->>+Controller: register(req, res)
+    Router->>+Validate: validate({ body: registerSchema })
 
     rect rgb(255, 240, 240)
-        note over Controller: Validazione input
-        alt email o password mancanti
-            Controller-->>Client: 400 Bad Request<br/>{ error: "Credenziali mancanti" }
+        note over Validate: Valida body (email valida,<br/>password >= 8 caratteri)
+        alt email non valida o password troppo corta
+            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
+
+    Validate->>+Controller: register(req, res)
 
     Controller->>+DAO: findByEmail(email)
     DAO->>+DB: SELECT * FROM users<br/>WHERE email = ?
@@ -30,11 +33,11 @@ sequenceDiagram
     end
 
     rect rgb(240, 255, 240)
-        note over Controller,DB: Creazione utente
+        note over Controller,DB: Creazione utente (sempre Role.User)
         Controller->>+JWT: bcrypt.hash(password, 10)
         JWT-->>-Controller: hashedPassword
 
-        Controller->>+DAO: create({ email, password: hashed,<br/>role: role === 'admin' ? 'admin' : 'user' })
+        Controller->>+DAO: create({ email, password: hashed, role: Role.User })
         DAO->>+DB: INSERT INTO users (...)
         DB-->>-DAO: User
         DAO-->>-Controller: User
@@ -43,5 +46,6 @@ sequenceDiagram
         JWT-->>-Controller: accessToken
     end
 
-    Controller-->>-Router: { token, role }
-    Router-->>-Client: 201 Created<br/>{ token: "eyJ...", role: "..." }
+    Controller-->>-Validate: { token, role }
+    Validate-->>-Router: { token, role }
+    Router-->>-Client: 201 Created<br/>{ token: "eyJ...", role: "user" }

@@ -2,8 +2,9 @@ sequenceDiagram
     autonumber
     actor Client
     participant Router as Router<br/>/documents
-    participant Upload as uploadPdf<br/>(Multer)
     participant Auth as authenticate<br/>(JWT Middleware)
+    participant Upload as uploadPdf<br/>(Multer)
+    participant Validate as validate<br/>(Zod Middleware)
     participant Controller as DocumentController
     participant DAO as DocumentDAO
     participant DB@{ shape: "database" } as Database
@@ -23,46 +24,57 @@ sequenceDiagram
     Auth->>+Upload: uploadPdf(req, res, next)
 
     rect rgb(255, 240, 240)
-        note over Upload: Validazione file
+        note over Upload: Validazione file (max 10MB)
         alt file non PDF
             Upload-->>Client: 400 Bad Request<br/>{ error: "Tipo file non valido" }
         end
     end
 
-    Upload->>+Controller: createDocument(req, res)
+    Upload->>+Validate: validate({ body: createDocumentSchema })
 
     rect rgb(255, 240, 240)
-        note over Controller: Validazione body
-        alt title o description mancanti
-            Controller-->>Client: 400 Bad Request<br/>{ error: "Title e description sono obbligatori" }
+        note over Validate: Valida body (title, description<br/>stringhe non vuote)
+        alt title o description mancanti/vuoti
+            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
-        alt file assente
+    end
+
+    Validate->>+Controller: createDocument(req, res)
+
+    rect rgb(255, 240, 240)
+        alt file assente (req.file)
             Controller-->>Client: 400 Bad Request<br/>{ error: "File obbligatorio" }
         end
     end
 
-    Controller->>+DAO: create({ userId, title, description })
-    DAO->>+DB: INSERT INTO documents<br/>{ userId, title, description }
-    DB-->>-DAO: Document
-    DAO-->>-Controller: Document
+    rect rgb(240, 248, 255)
+        note over Controller,Minio: Transazione DB (atomica)<br/>create + upload + update filePath
+        Controller->>+DB: BEGIN TRANSACTION
 
-    rect rgb(240, 255, 240)
-        note over Controller,Minio: Upload PDF su MinIO
+        Controller->>DAO: create({ userId, title, description }, transaction)
+        DAO->>DB: INSERT INTO documents<br/>{ userId, title, description }
+
         Controller->>+Minio: putObject(DOCUMENTS_BUCKET,<br/>"<id>/original.pdf", buffer)
         Minio-->>-Controller: ok
-        Controller->>+DAO: document.update({ filePath })
-        DAO->>+DB: UPDATE documents<br/>SET filePath = ?
-        DB-->>-DAO: ok
-        DAO-->>-Controller: ok
+
+        Controller->>DAO: document.update({ filePath }, { transaction })
+        DAO->>DB: UPDATE documents SET filePath = ?
+
+        Controller->>DB: COMMIT
+        DB-->>-Controller: Document
     end
 
     rect rgb(255, 240, 240)
-        alt errore MinIO
-            Controller->>DAO: document.destroy()
-            DAO->>DB: DELETE FROM documents WHERE id = ?
-            Controller-->>Client: 500 Internal Server Error<br/>{ error: "Errore storage" }
+        alt errore upload MinIO o scrittura DB
+            note over Controller,Minio: ROLLBACK automatico (INSERT annullato)<br/>+ rimozione file orfano se già caricato
+            Controller->>+Minio: removeObject(DOCUMENTS_BUCKET, fileKey)
+            Minio-->>-Controller: ok
+            Controller-->>Client: 503 Service Unavailable<br/>{ error: "Errore storage" }
         end
     end
 
-    Controller-->>-Router: { document }
+    Controller-->>-Validate: { document }
+    Validate-->>-Upload: { document }
+    Upload-->>-Auth: { document }
+    Auth-->>-Router: { document }
     Router-->>-Client: 201 Created<br/>{ document }

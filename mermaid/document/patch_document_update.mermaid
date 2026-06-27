@@ -3,6 +3,7 @@ sequenceDiagram
     actor Client
     participant Router as Router<br/>/documents/:id
     participant Auth as authenticate<br/>(JWT Middleware)
+    participant Validate as validate<br/>(Zod Middleware)
     participant Controller as DocumentController
     participant DAO as DocumentDAO
     participant DB@{ shape: "database" } as Database
@@ -18,7 +19,16 @@ sequenceDiagram
         end
     end
 
-    Auth->>+Controller: updateDocument(req, res)
+    Auth->>+Validate: validate({ params: idParamSchema,<br/>body: updateDocumentSchema })
+
+    rect rgb(255, 240, 240)
+        note over Validate: Valida :id (intero) e body<br/>(title?/description?, almeno uno)
+        alt dati non validi
+            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+        end
+    end
+
+    Validate->>+Controller: updateDocument(req, res)
 
     Controller->>+DAO: findByIdAndUser(id, userId)
     DAO->>+DB: SELECT * FROM documents<br/>WHERE id = ? AND userId = ?
@@ -39,5 +49,7 @@ sequenceDiagram
         DAO-->>-Controller: Document aggiornato
     end
 
-    Controller-->>-Router: { document }
+    Controller-->>-Validate: { document }
+    Validate-->>-Auth: { document }
+    Auth-->>-Router: { document }
     Router-->>-Client: 200 OK<br/>{ document }

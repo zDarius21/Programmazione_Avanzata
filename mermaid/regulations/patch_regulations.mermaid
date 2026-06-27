@@ -1,16 +1,15 @@
 sequenceDiagram
     autonumber
     actor Client
-    participant Router as Router<br/>/regulations
+    participant Router as Router<br/>/regulations/:id
     participant Auth as authenticate<br/>(JWT Middleware)
     participant Role as requireAdmin<br/>(Role Middleware)
-    participant Upload as uploadPdf<br/>(Multer)
+    participant Validate as validate<br/>(Zod Middleware)
     participant Controller as RegulationController
-    participant PDF as pdf-parse
     participant DAO as RegulationDAO
     participant DB@{ shape: "database" } as Database
 
-    Client->>+Router: POST /regulations<br/>multipart/form-data<br/>{ name, version, description?, file? }
+    Client->>+Router: PATCH /regulations/:id<br/>Authorization: Bearer token<br/>{ name?, description?, version? }
 
     Router->>+Auth: authenticate(req, res, next)
 
@@ -24,54 +23,43 @@ sequenceDiagram
     Auth->>+Role: requireAdmin(req, res, next)
 
     rect rgb(255, 240, 240)
-        alt ruolo != "admin"
+        alt ruolo != Role.Admin
             Role-->>Client: 403 Forbidden<br/>{ error: "Accesso negato" }
         end
     end
 
-    Role->>+Upload: uploadPdf(req, res, next)
+    Role->>+Validate: validate({ params: idParamSchema,<br/>body: updateRegulationSchema })
 
     rect rgb(255, 240, 240)
-        alt file non PDF o > 10 MB
-            Upload-->>Client: 400 Bad Request<br/>{ error: "Tipo file non valido" }
+        note over Validate: Valida :id (intero) e body<br/>(almeno un campo, non vuoti)
+        alt id non intero o body vuoto
+            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
 
-    Upload->>+Controller: createRegulation(req, res)
+    Validate->>+Controller: updateRegulation(req, res)
 
-    rect rgb(240, 255, 240)
-        note over Controller,PDF: Estrazione testo da PDF (opzionale)
-        alt file allegato
-            Controller->>+PDF: new PDFParse({ data: buffer }).getText()
-            PDF-->>-Controller: { text }
-            note over Controller: description = text estratto dal PDF
-        end
-    end
-
-    rect rgb(255, 240, 240)
-        note over Controller: Validazione body
-        alt name, version o description mancanti
-            Controller-->>Client: 400 Bad Request<br/>{ error: "Campi normativa obbligatori" }
-        end
-    end
-
-    Controller->>+DAO: findByName(name)
-    DAO->>+DB: SELECT * FROM regulations<br/>WHERE name = ?
+    Controller->>+DAO: findById(req.params.id)
+    DAO->>+DB: SELECT * FROM regulations<br/>WHERE id = ?
     DB-->>-DAO: Regulation | null
     DAO-->>-Controller: Regulation | null
 
     rect rgb(255, 240, 240)
-        alt normativa già esistente
-            Controller-->>Client: 409 Conflict<br/>{ error: "Normativa già esistente" }
+        alt normativa non trovata
+            Controller-->>Client: 404 Not Found<br/>{ error: "Normativa non trovata" }
         end
     end
 
     rect rgb(240, 255, 240)
-        Controller->>+DAO: create({ name, description, version })
-        DAO->>+DB: INSERT INTO regulations<br/>{ name, description, version }
-        DB-->>-DAO: Regulation
-        DAO-->>-Controller: Regulation
+        note over Controller,DB: Aggiornamento normativa
+        Controller->>+DAO: regulation.update({ name, description, version })
+        DAO->>+DB: UPDATE regulations SET<br/>name, description, version WHERE id = ?
+        DB-->>-DAO: ok
+        DAO-->>-Controller: Regulation aggiornata
     end
 
-    Controller-->>-Router: { regulation }
-    Router-->>-Client: 201 Created<br/>{ regulation }
+    Controller-->>-Validate: { regulation }
+    Validate-->>-Role: { regulation }
+    Role-->>-Auth: { regulation }
+    Auth-->>-Router: { regulation }
+    Router-->>-Client: 200 OK<br/>{ regulation }

@@ -234,6 +234,9 @@ export const createDocument = async (req: Request, res: Response): Promise<void>
   }
 
   let document: Document;
+  // Traccia la chiave del file caricato su MinIO: serve a rimuovere l'oggetto
+  // orfano se la transazione fallisce dopo l'upload (MinIO non è transazionale).
+  let uploadedKey: string | null = null;
   try {
     document = await Database.getInstance().transaction(async (t) => {
       const doc = await DocumentDAO.create({ userId: req.user.id, title, description }, t);
@@ -245,10 +248,16 @@ export const createDocument = async (req: Request, res: Response): Promise<void>
         req.file!.size,
         { 'Content-Type': 'application/pdf' }
       );
+      uploadedKey = fileKey;
       await doc.update({ filePath: fileKey }, { transaction: t });
       return doc;
     });
   } catch {
+    // La transazione ha già fatto rollback dell'INSERT: se il file era stato
+    // caricato su MinIO va rimosso esplicitamente per non lasciare oggetti orfani.
+    if (uploadedKey) {
+      await MinioStorage.getInstance().removeObject(MinioStorage.DOCUMENTS_BUCKET, uploadedKey).catch(() => {});
+    }
     ResponseFactory.sendError(res, ErrorEnum.StorageError);
     return;
   }
@@ -388,11 +397,6 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
     ResponseFactory.sendError(res, ErrorEnum.DatabaseError);
     return;
   }
-  await document.update({ status: DocumentStatus.Analyzed, reportPath: reportKey });
-  await UserDAO.deductTokens(req.user.id);
-
-  // Crea il record del report nel DB con il proprio ID univoco
-  await ReportDAO.create({ documentId: document.id, userId: req.user.id, filePath: reportKey });
 
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentAnalyzed, {
     document,

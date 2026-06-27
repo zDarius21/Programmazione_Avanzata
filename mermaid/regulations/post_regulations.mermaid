@@ -5,6 +5,7 @@ sequenceDiagram
     participant Auth as authenticate<br/>(JWT RS256)
     participant Role as requireAdmin
     participant Upload as uploadPdf<br/>(multer memoryStorage)
+    participant Validate as validate<br/>(Zod Middleware)
     participant Controller as RegulationController
     participant PDF as PDFParse<br/>(pdf-parse)
     participant DAO as RegulationDAO
@@ -13,7 +14,7 @@ sequenceDiagram
     Client->>+Router: POST /regulations<br/>Authorization: Bearer token<br/>multipart/form-data { name, version, file? }
 
     rect rgb(255, 240, 240)
-        note over Auth,Upload: Chain of Responsibility (middleware)
+        note over Auth,Validate: Chain of Responsibility (middleware)
         Router->>+Auth: authenticate(req, res, next)
         alt token mancante o non valido
             Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
@@ -21,7 +22,7 @@ sequenceDiagram
         Auth-->>-Router: req.user
 
         Router->>+Role: requireAdmin(req, res, next)
-        alt ruolo != admin
+        alt ruolo != Role.Admin
             Role-->>Client: 403 Forbidden<br/>{ error: "Accesso riservato agli admin" }
         end
         Role-->>-Router: next()
@@ -31,6 +32,12 @@ sequenceDiagram
             Upload-->>Client: 400 Bad Request<br/>{ error: "Tipo di file non valido" }
         end
         Upload-->>-Router: req.file (buffer in RAM)
+
+        Router->>+Validate: validate({ body: createRegulationSchema })
+        alt name o version mancanti
+            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+        end
+        Validate-->>-Router: next()
     end
 
     Router->>+Controller: createRegulation(req, res)
@@ -44,8 +51,8 @@ sequenceDiagram
     end
 
     rect rgb(255, 240, 240)
-        note over Controller: Validazione input
-        alt name, version o description mancanti
+        note over Controller: description obbligatoria (dal body o dal PDF)
+        alt description mancante
             Controller-->>Client: 400 Bad Request<br/>{ error: "Campi normativa richiesti" }
         end
     end

@@ -4,6 +4,7 @@ sequenceDiagram
     participant Router as Router<br/>/users/:id
     participant Auth as authenticate<br/>(JWT RS256)
     participant Role as requireAdmin
+    participant Validate as validate<br/>(Zod Middleware)
     participant Controller as UserController
     participant DAO as UserDAO
     participant DB@{ "type": "database" } as Database
@@ -11,7 +12,7 @@ sequenceDiagram
     Client->>+Router: PATCH /users/:id<br/>Authorization: Bearer token<br/>{ email?, password?, role? }
 
     rect rgb(255, 240, 240)
-        note over Auth,Role: Chain of Responsibility (middleware)
+        note over Auth,Validate: Chain of Responsibility (middleware)
         Router->>+Auth: authenticate(req, res, next)
         alt token mancante o non valido
             Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
@@ -19,10 +20,16 @@ sequenceDiagram
         Auth-->>-Router: req.user
 
         Router->>+Role: requireAdmin(req, res, next)
-        alt ruolo != admin
+        alt ruolo != Role.Admin
             Role-->>Client: 403 Forbidden<br/>{ error: "Accesso riservato agli admin" }
         end
         Role-->>-Router: next()
+
+        Router->>+Validate: validate({ params: idParamSchema,<br/>body: updateUserSchema })
+        alt id non intero, body vuoto o role non valido
+            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+        end
+        Validate-->>-Router: next()
     end
 
     Router->>+Controller: updateUser(req, res)
@@ -55,8 +62,8 @@ sequenceDiagram
             Controller->>Controller: user.password = bcrypt.hash(password, 10)
         end
 
-        alt role == 'admin' e ruolo attuale == 'user'
-            Controller->>Controller: user.role = 'admin'
+        alt role == Role.Admin e ruolo attuale == Role.User
+            Controller->>Controller: user.role = Role.Admin
         end
     end
 

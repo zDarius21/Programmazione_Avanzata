@@ -4,6 +4,7 @@ sequenceDiagram
     participant Router as Router<br/>/users
     participant Auth as authenticate<br/>(JWT RS256)
     participant Role as requireAdmin
+    participant Validate as validate<br/>(Zod Middleware)
     participant Controller as UserController
     participant DAO as UserDAO
     participant DB@{ "type": "database" } as Database
@@ -11,7 +12,7 @@ sequenceDiagram
     Client->>+Router: POST /users<br/>Authorization: Bearer token<br/>{ email, password }
 
     rect rgb(255, 240, 240)
-        note over Auth,Role: Chain of Responsibility (middleware)
+        note over Auth,Validate: Chain of Responsibility (middleware)
         Router->>+Auth: authenticate(req, res, next)
         alt token mancante o non valido
             Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
@@ -19,20 +20,19 @@ sequenceDiagram
         Auth-->>-Router: req.user
 
         Router->>+Role: requireAdmin(req, res, next)
-        alt ruolo != admin
+        alt ruolo != Role.Admin
             Role-->>Client: 403 Forbidden<br/>{ error: "Accesso riservato agli admin" }
         end
         Role-->>-Router: next()
+
+        Router->>+Validate: validate({ body: createUserSchema })
+        alt email non valida o password < 8 caratteri
+            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+        end
+        Validate-->>-Router: next()
     end
 
     Router->>+Controller: createUser(req, res)
-
-    rect rgb(255, 240, 240)
-        note over Controller: Validazione input
-        alt email o password mancanti
-            Controller-->>Client: 400 Bad Request<br/>{ error: "Email e password richieste" }
-        end
-    end
 
     Controller->>+DAO: findByEmail(email)
     DAO->>+DB: SELECT * FROM users<br/>WHERE email = ?
@@ -48,7 +48,7 @@ sequenceDiagram
     rect rgb(240, 255, 240)
         note over Controller,DB: Creazione utente
         Controller->>Controller: bcrypt.hash(password, 10)
-        Controller->>+DAO: create({ email, password: hashed, role: 'user' })
+        Controller->>+DAO: create({ email, password: hashed, role: Role.User })
         DAO->>+DB: INSERT INTO users (...)
         DB-->>-DAO: User
         DAO-->>-Controller: User

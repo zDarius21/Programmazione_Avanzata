@@ -2,6 +2,7 @@ sequenceDiagram
     autonumber
     actor Client
     participant Router as Router<br/>/auth/login
+    participant Validate as validate<br/>(Zod Middleware)
     participant Controller as AuthController
     participant DAO as UserDAO
     participant DB@{ "type": "database" } as Database
@@ -9,14 +10,16 @@ sequenceDiagram
 
     Client->>+Router: POST /auth/login<br/>{ email, password }
 
-    Router->>+Controller: login(req, res)
+    Router->>+Validate: validate({ body: loginSchema })
 
     rect rgb(255, 240, 240)
-        note over Controller: Validazione input
-        alt email o password mancanti
-            Controller-->>Client: 400 Bad Request<br/>{ error: "Credenziali mancanti" }
+        note over Validate: Valida body (email valida,<br/>password non vuota)
+        alt email non valida o password mancante
+            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
+
+    Validate->>+Controller: login(req, res)
 
     Controller->>+DAO: findByEmail(email)
     DAO->>+DB: SELECT * FROM users<br/>WHERE email = ?
@@ -25,7 +28,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt utente non trovato
-            Controller-->>Client: 401 Unauthorized<br/>{ error: "Utente non trovato" }
+            Controller-->>Client: 401 Unauthorized<br/>{ error: "Credenziali non valide" }
         end
     end
 
@@ -44,5 +47,6 @@ sequenceDiagram
         JWT-->>-Controller: accessToken
     end
 
-    Controller-->>-Router: { token, role }
+    Controller-->>-Validate: { token, role }
+    Validate-->>-Router: { token, role }
     Router-->>-Client: 200 OK<br/>{ token: "eyJ...", role: "..." }
