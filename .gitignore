@@ -15,8 +15,5 @@
 
 /postman/environments
 
-/docs
-
-typedoc.json
-
 package-lock.json
+
