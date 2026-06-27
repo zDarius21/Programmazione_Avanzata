@@ -31,9 +31,15 @@ export const ERR_VALIDATION                 = 'Dati della richiesta non validi';
 
 // Messaggi di validazione a livello di singolo campo (usati negli schemi Zod)
 export const VAL_ID_INVALID                 = 'id deve essere un intero positivo';
+export const VAL_EMAIL_REQUIRED             = 'Email obbligatoria';
 export const VAL_EMAIL_INVALID              = 'Email non valida';
-export const VAL_PASSWORD_MIN               = 'La password deve avere almeno 8 caratteri';
 export const VAL_PASSWORD_REQUIRED          = 'Password obbligatoria';
+export const VAL_PASSWORD_MIN               = 'La password deve avere almeno 8 caratteri';
+export const VAL_PASSWORD_UPPERCASE         = 'La password deve contenere almeno una lettera maiuscola';
+export const VAL_PASSWORD_LOWERCASE         = 'La password deve contenere almeno una lettera minuscola';
+export const VAL_PASSWORD_NUMBER            = 'La password deve contenere almeno un numero';
+export const VAL_PASSWORD_SPECIAL           = 'La password deve contenere almeno un carattere speciale';
+export const VAL_PASSWORD_NO_SPACES         = 'La password non può contenere spazi';
 export const VAL_NOTHING_TO_UPDATE          = 'Specificare almeno un campo da aggiornare';
 export const VAL_TOKENS_TYPE                = 'Il campo tokens deve essere un numero';
 export const VAL_TOKENS_INT                 = 'Il campo tokens deve essere un intero';
