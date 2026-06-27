@@ -2,6 +2,7 @@ import { Transaction } from 'sequelize';
 import Document from '../models/Document';
 import { IDao } from './IDao';
 import { AppError, ErrorEnum } from '../factory/error';
+import { DocumentStatus } from '../enums/documentStatus';
 
 type DocumentCreateData = { userId: number; title: string; description: string };
 
@@ -66,7 +67,7 @@ class DocumentDAO implements IDao<Document, DocumentCreateData> {
    * */
   async findAllAnalyzedByUser(userId: number) {
     try {
-      return await Document.findAll({ where: { userId, status: 'analyzed' } });
+      return await Document.findAll({ where: { userId, status: DocumentStatus.Analyzed } });
     } catch {
       throw new AppError(ErrorEnum.DatabaseError);
     }
@@ -80,7 +81,7 @@ class DocumentDAO implements IDao<Document, DocumentCreateData> {
    * */
   async findAnalyzedByIdAndUser(id: string | number, userId: number) {
     try {
-      return await Document.findOne({ where: { id, userId, status: 'analyzed' } });
+      return await Document.findOne({ where: { id, userId, status: DocumentStatus.Analyzed } });
     } catch {
       throw new AppError(ErrorEnum.DatabaseError);
     }

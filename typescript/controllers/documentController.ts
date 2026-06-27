@@ -7,8 +7,10 @@ import UserDAO from '../dao/UserDAO';
 import MinioStorage from '../singleton/minio';
 import Database from '../singleton/database';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
+import { DocumentStatus } from '../enums/documentStatus';
 
 const ANALYSIS_TOKEN_COST = 10;
+
 /**
  * Funzione che genera un report PDF per un documento analizzato, basandosi sui dati del modello Document.
  * @param docModel Modello del documento da analizzare
@@ -226,11 +228,6 @@ export const getDocumentById = async (req: Request, res: Response): Promise<void
 export const createDocument = async (req: Request, res: Response): Promise<void> => {
   const { title, description } = req.body;
 
-  if (!title || !description) {
-    ResponseFactory.sendError(res, ErrorEnum.TitleDescriptionRequired);
-    return;
-  }
-
   if (!req.file) {
     ResponseFactory.sendError(res, ErrorEnum.FileRequired);
     return;
@@ -292,8 +289,8 @@ export const deleteDocument = async (req: Request, res: Response): Promise<void>
   if (document.filePath)   await client.removeObject(MinioStorage.DOCUMENTS_BUCKET, document.filePath).catch(() => {});
   if (document.reportPath) await client.removeObject(MinioStorage.REPORTS_BUCKET,   document.reportPath).catch(() => {});
 
-  await document.destroy();
-  ResponseFactory.sendSuccess(res, SuccessEnum.DocumentDeleted, { message: `Documento "${document.title}" eliminato` });
+  await document.destroy(); 
+  ResponseFactory.sendSuccess(res, SuccessEnum.DocumentDeleted, {message: `Documento "${document.title}" eliminato` });
 };
 
 /**
@@ -337,7 +334,8 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
     return;
   }
 
-  if (document.status === 'analyzed') {
+
+  if (document.status === DocumentStatus.Analyzed) {
     ResponseFactory.sendError(res, ErrorEnum.DocumentAlreadyAnalyzed);
     return;
   }
@@ -376,7 +374,7 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
   let reportId: number;
   try {
     reportId = await Database.getInstance().transaction(async (t) => {
-      await document.update({ status: 'analyzed', reportPath: reportKey }, { transaction: t });
+      await document.update({ status: DocumentStatus.Analyzed, reportPath: reportKey }, { transaction: t });
       await UserDAO.deductTokens(req.user.id, ANALYSIS_TOKEN_COST, t);
       const report = await ReportDAO.create(
         { documentId: document.id, userId: req.user.id, filePath: reportKey },
@@ -390,6 +388,11 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
     ResponseFactory.sendError(res, ErrorEnum.DatabaseError);
     return;
   }
+  await document.update({ status: DocumentStatus.Analyzed, reportPath: reportKey });
+  await UserDAO.deductTokens(req.user.id);
+
+  // Crea il record del report nel DB con il proprio ID univoco
+  await ReportDAO.create({ documentId: document.id, userId: req.user.id, filePath: reportKey });
 
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentAnalyzed, {
     document,

@@ -27,4 +27,22 @@ export const ERR_DATABASE_ERROR              = 'Errore durante l\'operazione sul
 export const ERR_NOTHING_TO_UPDATE          = 'Non si possono utilizzare valori uguali a quelli presenti';
 export const ERR_INVALID_TOKEN_AMOUNT       = 'Il campo tokens deve essere un intero positivo';
 export const ERR_TOKEN_CAP_EXCEEDED         = 'La ricarica supera il massimo consentito di 100 token';
+export const ERR_VALIDATION                 = 'Dati della richiesta non validi';
+
+// Messaggi di validazione a livello di singolo campo (usati negli schemi Zod)
+export const VAL_ID_INVALID                 = 'id deve essere un intero positivo';
+export const VAL_EMAIL_INVALID              = 'Email non valida';
+export const VAL_PASSWORD_MIN               = 'La password deve avere almeno 8 caratteri';
+export const VAL_PASSWORD_REQUIRED          = 'Password obbligatoria';
+export const VAL_NOTHING_TO_UPDATE          = 'Specificare almeno un campo da aggiornare';
+export const VAL_TOKENS_TYPE                = 'Il campo tokens deve essere un numero';
+export const VAL_TOKENS_INT                 = 'Il campo tokens deve essere un intero';
+export const VAL_TOKENS_POSITIVE            = 'Il campo tokens deve essere positivo';
+export const VAL_TOKENS_MAX                 = 'La ricarica non può superare i 100 token';
+export const VAL_TITLE_REQUIRED             = 'Il titolo è obbligatorio';
+export const VAL_DESCRIPTION_REQUIRED       = 'La descrizione è obbligatoria';
+export const VAL_TITLE_EMPTY                = 'Il titolo non può essere vuoto';
+export const VAL_DESCRIPTION_EMPTY          = 'La descrizione non può essere vuota';
+export const VAL_NAME_REQUIRED              = 'Il nome è obbligatorio';
+export const VAL_VERSION_REQUIRED           = 'La versione è obbligatoria';
 

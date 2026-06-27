@@ -1,8 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import Database from '../singleton/database';
-
-// Stati possibili di un documento: in attesa di analisi o già analizzato
-type DocumentStatus = 'pending' | 'analyzed';
+import { DocumentStatus } from '../enums/documentStatus';
 
 // Attributi completi di un documento
 interface DocumentAttributes {
@@ -39,7 +37,7 @@ Document.init(
     userId:      { type: DataTypes.INTEGER,                           allowNull: false },
     title:       { type: DataTypes.STRING,                            allowNull: false },
     description: { type: DataTypes.TEXT,                              allowNull: false },
-    status:      { type: DataTypes.ENUM('pending', 'analyzed'),       allowNull: false, defaultValue: 'pending' },
+    status:      { type: DataTypes.ENUM(...Object.values(DocumentStatus)), allowNull: false, defaultValue: DocumentStatus.Pending },
     filePath:    { type: DataTypes.STRING(500),                       allowNull: true },
     reportPath:  { type: DataTypes.STRING(500),                       allowNull: true },
   },

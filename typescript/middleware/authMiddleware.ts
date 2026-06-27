@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import fs from 'node:fs';
 import jwt from 'jsonwebtoken';
 import ResponseFactory, { ErrorEnum } from '../factory/responseFactory';
+import { Role } from '../enums/role';
 
 // La chiave pubblica viene usata per verificare la firma dei token in entrata
 const PUBLIC_KEY = fs.readFileSync(process.env.JWT_PUBLIC_KEY_PATH ?? '', 'utf8');
@@ -14,7 +15,7 @@ const PUBLIC_KEY = fs.readFileSync(process.env.JWT_PUBLIC_KEY_PATH ?? '', 'utf8'
 export interface AuthPayload {
   id: number;
   email: string;
-  role: 'user' | 'admin';
+  role: Role;
 }
 
 // Estendiamo il tipo Request di Express per aggiungere il campo user

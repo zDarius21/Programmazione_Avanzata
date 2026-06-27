@@ -102,6 +102,9 @@ class InvalidTokenAmount implements ErrorObj {
 class TokenCapExceeded implements ErrorObj {
   getErrorObj() { return { status: 400, message: ErrorMessages.ERR_TOKEN_CAP_EXCEEDED }; }
 }
+class ValidationError implements ErrorObj {
+  getErrorObj() { return { status: 400, message: ErrorMessages.ERR_VALIDATION }; }
+}
 
 // Enum con tutti i tipi di errore
 export enum ErrorEnum {
@@ -133,6 +136,7 @@ export enum ErrorEnum {
   NothingToUpdate          = 'NothingToUpdate',
   InvalidTokenAmount       = 'InvalidTokenAmount',
   TokenCapExceeded         = 'TokenCapExceeded',
+  ValidationError          = 'ValidationError',
 }
 
 // Funzione che riceve il tipo di enum di errore e restituisce l'istanza della classe corrispondente
@@ -166,6 +170,7 @@ export function getError(type: ErrorEnum): ErrorObj {
     case ErrorEnum.NothingToUpdate:          return new NothingToUpdate();
     case ErrorEnum.InvalidTokenAmount:       return new InvalidTokenAmount();
     case ErrorEnum.TokenCapExceeded:         return new TokenCapExceeded();
+    case ErrorEnum.ValidationError:          return new ValidationError();
     default: throw new Error(`Errore sconosciuto: ${type}`);
   }
 }

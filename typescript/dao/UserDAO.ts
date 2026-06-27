@@ -2,10 +2,11 @@ import { Transaction } from 'sequelize';
 import User from '../models/User';
 import { IDao } from './IDao';
 import { AppError, ErrorEnum } from '../factory/error';
+import { Role } from '../enums/role';
 
 const SAFE_ATTRIBUTES = ['id', 'email', 'role', 'tokens', 'createdAt', 'updatedAt'];
 
-type UserCreateData = { email: string; password: string; role: 'user' | 'admin' };
+type UserCreateData = { email: string; password: string; role: Role };
 
 // DAO per le operazioni di accesso ai dati degli utenti
 class UserDAO implements IDao<User, UserCreateData> {

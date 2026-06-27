@@ -4,6 +4,7 @@ import UserDAO from '../dao/UserDAO';
 import DocumentDAO from '../dao/DocumentDAO';
 import MinioStorage from '../singleton/minio';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
+import { Role } from '../enums/role';
 
 /**
  * Implementazione della rotta /users di tipo "GET". Si restituiscono le informazioni sicure di tutti gli utenti
@@ -40,11 +41,6 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    ResponseFactory.sendError(res, ErrorEnum.EmailPasswordRequired);
-    return;
-  }
-
   const existing = await UserDAO.findByEmail(email);
   if (existing) {
     ResponseFactory.sendError(res, ErrorEnum.EmailAlreadyUsed);
@@ -52,7 +48,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
   }
 
   const passwordHashed = await bcrypt.hash(password, 10);
-  const user = await UserDAO.create({ email, password: passwordHashed, role: 'user' });
+  const user = await UserDAO.create({ email, password: passwordHashed, role: Role.User });
 
   ResponseFactory.sendSuccess(res, SuccessEnum.UserCreated, { id: user.id, email: user.email, role: user.role });
 };
@@ -86,8 +82,8 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     user.password = await bcrypt.hash(password, 10);
   }
 
-  if (role === 'admin' && user.role === 'user') {
-    user.role = 'admin';
+  if (role === Role.Admin && user.role === Role.User) {
+    user.role = Role.Admin;
   }
 
   await user.save();
@@ -142,11 +138,8 @@ export const getMyTokens = async (req: Request, res: Response): Promise<void> =>
  * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
  */
 export const rechargeTokens = async (req: Request, res: Response): Promise<void> => {
-  const amount = Number(req.body.tokens);
-  if (!Number.isInteger(amount) || amount <= 0 || amount > 100) {
-    ResponseFactory.sendError(res, ErrorEnum.InvalidTokenAmount);
-    return;
-  }
+  // tokens è già validato e convertito a numero intero positivo dallo schema Zod
+  const amount = req.body.tokens as number;
 
   const user = await UserDAO.findById(req.params.id);
   if (!user) {

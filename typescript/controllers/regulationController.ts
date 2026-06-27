@@ -43,7 +43,8 @@ export const createRegulation = async (req: Request, res: Response): Promise<voi
     description = result.text.trim();
   }
 
-  if (!name || !version || !description) {
+  // name e version sono già validati da Zod; la description può provenire dal PDF estratto
+  if (!description) {
     ResponseFactory.sendError(res, ErrorEnum.RegulationFieldsRequired);
     return;
   }
