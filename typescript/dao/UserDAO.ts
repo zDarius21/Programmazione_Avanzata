@@ -1,3 +1,4 @@
+import { Transaction } from 'sequelize';
 import User from '../models/User';
 import { IDao } from './IDao';
 import { AppError, ErrorEnum } from '../factory/error';
@@ -76,8 +77,8 @@ class UserDAO implements IDao<User, UserCreateData> {
    * @param userId - L'id dell'utente.
    * @param amount - L'ammontare di token da decrementare.
    */
-  async deductTokens(userId: number, amount: number = 10): Promise<void> {
-    await User.decrement('tokens', { by: amount, where: { id: userId } });
+  async deductTokens(userId: number, amount: number = 10, t?: Transaction): Promise<void> {
+    await User.decrement('tokens', { by: amount, where: { id: userId }, transaction: t });
   }
   /**
    * Ricarica i token degli utenti fino a un massimo specificato, lanciato in automatico, impostato per aggiungere 10 token ogni 6 ore.

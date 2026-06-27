@@ -5,7 +5,10 @@ import DocumentDAO from '../dao/DocumentDAO';
 import ReportDAO from '../dao/ReportDAO';
 import UserDAO from '../dao/UserDAO';
 import MinioStorage from '../singleton/minio';
+import Database from '../singleton/database';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
+
+const ANALYSIS_TOKEN_COST = 10;
 /**
  * Funzione che genera un report PDF per un documento analizzato, basandosi sui dati del modello Document.
  * @param docModel Modello del documento da analizzare
@@ -233,20 +236,22 @@ export const createDocument = async (req: Request, res: Response): Promise<void>
     return;
   }
 
-  const document = await DocumentDAO.create({ userId: req.user.id, title, description });
-
-  const fileKey = `${document.id}/original.pdf`;
+  let document: Document;
   try {
-    await MinioStorage.getInstance().putObject(
-      MinioStorage.DOCUMENTS_BUCKET,
-      fileKey,
-      req.file.buffer,
-      req.file.size,
-      { 'Content-Type': 'application/pdf' }
-    );
-    await document.update({ filePath: fileKey });
+    document = await Database.getInstance().transaction(async (t) => {
+      const doc = await DocumentDAO.create({ userId: req.user.id, title, description }, t);
+      const fileKey = `${doc.id}/original.pdf`;
+      await MinioStorage.getInstance().putObject(
+        MinioStorage.DOCUMENTS_BUCKET,
+        fileKey,
+        req.file!.buffer,
+        req.file!.size,
+        { 'Content-Type': 'application/pdf' }
+      );
+      await doc.update({ filePath: fileKey }, { transaction: t });
+      return doc;
+    });
   } catch {
-    await document.destroy();
     ResponseFactory.sendError(res, ErrorEnum.StorageError);
     return;
   }
@@ -332,23 +337,29 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
     return;
   }
 
-  // Evita di rianalizzare e riscalare i token per un documento già analizzato  
-  // METTERE ENUMERATIVO
   if (document.status === 'analyzed') {
     ResponseFactory.sendError(res, ErrorEnum.DocumentAlreadyAnalyzed);
     return;
   }
-//METTERE 10 COME CONST
+
   const user = await UserDAO.findByIdFull(req.user.id);
-  if (!user || user.tokens < 10) {
+  if (!user || user.tokens < ANALYSIS_TOKEN_COST) {
     ResponseFactory.sendError(res, ErrorEnum.InsufficientTokens);
     return;
   }
 
-  //INSERIRE ALL'INTERNO DI UNA TRANSAZIONE MANAGE
   const reportKey = `${document.id}/report.pdf`;
+
+  //Generazione PDF + upload MinIO 
+  let pdfBuffer: Buffer;
   try {
-    const pdfBuffer = await generateReport(document);
+    pdfBuffer = await generateReport(document);
+  } catch {
+    ResponseFactory.sendError(res, ErrorEnum.StorageError);
+    return;
+  }
+
+  try {
     await MinioStorage.getInstance().putObject(
       MinioStorage.REPORTS_BUCKET,
       reportKey,
@@ -361,16 +372,29 @@ export const analyzeDocument = async (req: Request, res: Response): Promise<void
     return;
   }
 
-  await document.update({ status: 'analyzed', reportPath: reportKey });
-  await UserDAO.deductTokens(req.user.id);
-
-  // Crea il record del report nel DB con il proprio ID univoco
-  const report = await ReportDAO.create({ documentId: document.id, userId: req.user.id, filePath: reportKey });
+  // Transazione per racchiudere tutte le azioni di aggiornamento
+  let reportId: number;
+  try {
+    reportId = await Database.getInstance().transaction(async (t) => {
+      await document.update({ status: 'analyzed', reportPath: reportKey }, { transaction: t });
+      await UserDAO.deductTokens(req.user.id, ANALYSIS_TOKEN_COST, t);
+      const report = await ReportDAO.create(
+        { documentId: document.id, userId: req.user.id, filePath: reportKey },
+        t
+      );
+      return report.id;
+    });
+  } catch {
+    // rollback in caso di errore
+    await MinioStorage.getInstance().removeObject(MinioStorage.REPORTS_BUCKET, reportKey).catch(() => {});
+    ResponseFactory.sendError(res, ErrorEnum.DatabaseError);
+    return;
+  }
 
   ResponseFactory.sendSuccess(res, SuccessEnum.DocumentAnalyzed, {
     document,
-    reportId: report.id,
-    tokensRemaining: user.tokens - 10,
+    reportId,
+    tokensRemaining: user.tokens - ANALYSIS_TOKEN_COST,
   });
 };
 

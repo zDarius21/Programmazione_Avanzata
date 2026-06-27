@@ -1,3 +1,4 @@
+import { Transaction } from 'sequelize';
 import Document from '../models/Document';
 import { IDao } from './IDao';
 import { AppError, ErrorEnum } from '../factory/error';
@@ -90,9 +91,9 @@ class DocumentDAO implements IDao<Document, DocumentCreateData> {
    * @param data - I dati del documento da creare.
    * @returns Restituisce il documento creato.
    * */
-  async create(data: DocumentCreateData) {
+  async create(data: DocumentCreateData, t?: Transaction) {
     try {
-      return await Document.create(data);
+      return await Document.create(data, { transaction: t });
     } catch {
       throw new AppError(ErrorEnum.DatabaseError);
     }

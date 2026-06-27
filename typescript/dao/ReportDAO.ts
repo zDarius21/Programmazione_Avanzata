@@ -1,3 +1,4 @@
+import { Transaction } from 'sequelize';
 import Report from '../models/Report';
 import { IDao } from './IDao';
 import { AppError, ErrorEnum } from '../factory/error';
@@ -51,9 +52,9 @@ class ReportDAO implements IDao<Report, ReportCreateData> {
    * @param data - I dati del report da creare.
    * @returns Restituisce il report creato.
    * */
-  async create(data: ReportCreateData) {
+  async create(data: ReportCreateData, t?: Transaction) {
     try {
-      return await Report.create(data);
+      return await Report.create(data, { transaction: t });
     } catch {
       throw new AppError(ErrorEnum.DatabaseError);
     }
