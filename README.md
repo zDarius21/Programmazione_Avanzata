@@ -5,6 +5,7 @@
 | Sezione | Contenuto |
 |--------|-----------|
 | [Obiettivo del Progetto](#obiettivo-del-progetto) | Scopo del backend e funzionalita principali |
+| [Diagramma dei Casi d'Uso](#diagramma-dei-casi-duso) | Attori e interazioni principali con il sistema |
 | [Rotte Disponibili](#rotte-disponibili) | Panoramica completa degli endpoint |
 | [Autenticazione](#autenticazione) | Login e registrazione |
 | [Utenti](#utenti) | CRUD utenti e gestione token |
@@ -29,6 +30,78 @@ Le operazioni principali sono:
 * Gestione dei metadati dei documenti e avvio analisi
 * Consultazione delle analisi e dei risultati di conformità
 * Recupero e download dei report
+
+## Diagramma dei Casi d'Uso
+
+Il diagramma mostra i tre attori del sistema e le operazioni che ciascuno può compiere. L'**Admin** eredita tutti i casi d'uso dell'**Utente autenticato** e ha accesso esclusivo alle operazioni di gestione.
+
+```mermaid
+flowchart LR
+    NC(["👤 Utente\nnon autenticato"]):::attore
+    U(["👤 Utente"]):::attore
+    A(["👤 Admin"]):::attore
+
+    A -. generalizzazione .-> U
+
+    subgraph Sistema["Document Compliance Checker"]
+        subgraph Auth["Autenticazione"]
+            UC1(["Registrarsi"])
+            UC2(["Effettuare il login"])
+            UC3(["Visualizzare il proprio profilo"])
+            UC4(["Modificare il proprio profilo"])
+        end
+
+        subgraph Docs["Documenti"]
+            UC5(["Visualizzare lista documenti"])
+            UC6(["Visualizzare dettaglio documento"])
+            UC7(["Scaricare file PDF"])
+            UC8(["Caricare nuovo documento"])
+            UC9(["Modificare documento"])
+            UC10(["Eliminare documento"])
+            UC11(["Avviare analisi di conformità"])
+        end
+
+        subgraph Regs["Normative"]
+            UC12(["Visualizzare lista normative"])
+            UC13(["Visualizzare dettaglio normativa"])
+            UC14(["Creare normativa"])
+            UC15(["Modificare normativa"])
+            UC16(["Eliminare normativa"])
+        end
+
+        subgraph Analyses["Analisi"]
+            UC17(["Visualizzare lista analisi"])
+            UC18(["Visualizzare dettaglio analisi"])
+        end
+
+        subgraph Reports["Report"]
+            UC19(["Scaricare report"])
+        end
+
+        subgraph Users["Utenti & Token"]
+            UC20(["Visualizzare token rimanenti"])
+            UC21(["Aggiungere token a utente"])
+            UC22(["Visualizzare lista utenti"])
+            UC23(["Creare utente"])
+            UC24(["Modificare utente"])
+            UC25(["Eliminare utente"])
+        end
+    end
+
+    NC --> UC1 & UC2
+
+    U --> UC3 & UC4
+    U --> UC5 & UC6 & UC7 & UC8 & UC9 & UC10 & UC11
+    U --> UC12 & UC13
+    U --> UC17 & UC18
+    U --> UC19
+    U --> UC20
+
+    A --> UC14 & UC15 & UC16
+    A --> UC21 & UC22 & UC23 & UC24 & UC25
+
+    classDef attore fill:#e8f4fd,stroke:#2980b9,stroke-width:2px,font-weight:bold
+```
 
 ## Rotte Disponibili
 
