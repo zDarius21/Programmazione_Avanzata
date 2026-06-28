@@ -43,7 +43,7 @@ flowchart LR
 
     A -. generalizzazione .-> U
 
-    subgraph Sistema["Document Compliance Checker"]
+    subgraph Sistema["Sistema "Document Compliance Checker""]
         subgraph Auth["Autenticazione"]
             UC1(["Registrarsi"])
             UC2(["Effettuare il login"])
