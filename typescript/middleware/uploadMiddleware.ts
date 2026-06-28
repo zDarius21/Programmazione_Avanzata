@@ -3,8 +3,9 @@ import { Request, Response, NextFunction } from 'express';
 import ResponseFactory, { ErrorEnum } from '../factory/responseFactory';
 
 /**
- * Configurazione del multer per accettare soltanto file PDF per un massimo di 10MB.
- * Non viene salvato su disco, ma tenuto su RAM tramite memoryStorage.
+ * Middleware per gestire l'upload di file PDF. Utilizza multer per gestire il caricamento dei file in memoria.
+ * Limita la dimensione del file a 10 MB e accetta solo file con estensione .pdf o mimetype 'application/pdf'.
+ * In caso di errore (file non valido o troppo grande), invia una risposta di errore standardizzata.
  */
 const multerInstance = multer({
   storage: multer.memoryStorage(),
@@ -19,7 +20,14 @@ const multerInstance = multer({
   },
 });
 
-// Middleware per la gestione degli errori del multer
+/**
+ * Middleware per gestire l'upload di file PDF. Utilizza multer per gestire il caricamento dei file in memoria.
+ * Limita la dimensione del file a 10 MB e accetta solo file con estensione .pdf o mimetype 'application/pdf'.
+ * In caso di errore (file non valido o troppo grande), invia una risposta di errore standardizzata.
+ * @param req La richiesta Express
+ * @param res La risposta Express
+ * @param next La funzione next di Express
+ */
 export const uploadPdf = (req: Request, res: Response, next: NextFunction): void => {
   multerInstance.single('file')(req, res, (err) => {
     if (err) {

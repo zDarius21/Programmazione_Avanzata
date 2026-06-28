@@ -7,6 +7,7 @@ class Database {
   /**
    * Crea o restituisce l'istanza singleton di Sequelize per la connessione al database.
    * @returns L'istanza singleton di Sequelize.
+   * @param sequelize L'istanza di Sequelize da utilizzare per la connessione al database.
    */
   static getInstance(): Sequelize {
     if (!Database.instance) {

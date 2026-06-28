@@ -12,6 +12,16 @@ interface ReportAttributes {
 // In fase di creazione l'id è auto-generato dal database
 interface ReportCreationAttributes extends Optional<ReportAttributes, 'id'> {}
 
+/**
+ * Rappresenta un report generato dall'analisi ESG di un documento. Estende il modello Sequelize per interagire con la tabella 'reports' nel database.
+ * Contiene informazioni sul documento analizzato, l'utente che ha richiesto l'analisi e il percorso del file PDF generato.
+ * 
+ * Attributi:
+ * - id: Identificativo univoco del report (auto-generato).
+ * - documentId: Identificativo del documento analizzato.
+ * - userId: Identificativo dell'utente che ha richiesto l'analisi.
+ * - filePath: Percorso del file PDF generato dal report.
+ */
 class Report extends Model<ReportAttributes, ReportCreationAttributes> implements ReportAttributes {
   declare id: number;
   declare documentId: number;

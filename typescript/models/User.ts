@@ -14,6 +14,17 @@ interface UserAttributes {
 // In fase di creazione id e tokens sono opzionali poichè creati automaticamente
 interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'tokens'> {}
 
+/**
+ * Rappresenta un utente del sistema. Estende il modello Sequelize per interagire con la tabella 'users' nel database.
+ * Contiene informazioni sull'email, la password, il ruolo e il numero di token disponibili per l'utente.
+ * 
+ * Attributi:
+ * - id: Identificativo univoco dell'utente (auto-generato).
+ * - email: Indirizzo email dell'utente.
+ * - password: Password dell'utente.
+ * - role: Ruolo dell'utente (es. admin, user).
+ * - tokens: Numero di token disponibili per l'utente.
+ */
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   declare id: number;
   declare email: string;

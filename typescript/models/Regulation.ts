@@ -11,7 +11,16 @@ interface RegulationAttributes {
 
 // In fase di creazione l'id è opzionale perché lo genera incrementalmente il database
 interface RegulationCreationAttributes extends Optional<RegulationAttributes, 'id'> {}
-
+/**
+ * Rappresenta una normativa del sistema. Estende il modello Sequelize per interagire con la tabella 'regulations' nel database.
+ * Contiene informazioni sul nome, la descrizione e la versione della normativa.
+ * 
+ * Attributi:
+ * - id: Identificativo univoco della normativa (auto-generato).
+ * - name: Nome della normativa.
+ * - description: Descrizione della normativa.
+ * - version: Versione della normativa.
+ */
 class Regulation extends Model<RegulationAttributes, RegulationCreationAttributes> implements RegulationAttributes {
   declare id: number;
   declare name: string;

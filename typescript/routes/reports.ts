@@ -5,11 +5,18 @@ import { idParamSchema } from '../validation/schemas';
 import { downloadReport } from '../controllers/reportController';
 
 const router = Router();
-
-// Tutte le rotte /reports richiedono autenticazione JWT
+//-------------------------------------------------------\\
+// Tutte le rotte /reports richiedono autenticazione JWT \\
+//-------------------------------------------------------\\
 router.use(authenticate);
 
-// Scarica il report PDF generato dall'analisi di un documento
+
+/**
+ * Rotta per scaricare un report PDF generato dall'analisi di un documento, identificato dal suo ID.
+ * Richiede un token JWT valido nell'intestazione Authorization.
+ * 
+ * @route GET /reports/:id
+ */
 router.get('/:id', validate({ params: idParamSchema }), downloadReport);
 
 export default router;

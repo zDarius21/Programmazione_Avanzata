@@ -16,7 +16,19 @@ interface DocumentAttributes {
 // In fase di creazione: id è auto-generato, status ha default 'pending', i path sono opzionali
 
 interface DocumentCreationAttributes extends Optional<DocumentAttributes, 'id' | 'status' | 'filePath' | 'reportPath'> {}
-
+/**
+ * Rappresenta un documento caricato nel sistema. Estende il modello Sequelize per interagire con la tabella 'documents' nel database.
+ * Contiene informazioni sul documento, come titolo, descrizione, stato e percorsi dei file.
+ * 
+ * Attributi:
+ * - id: Identificativo univoco del documento (auto-generato).
+ * - userId: Identificativo dell'utente che ha caricato il documento.
+ * - title: Titolo del documento.
+ * - description: Descrizione del documento.
+ * - status: Stato del documento (es. pending, approved, rejected).
+ * - filePath: Percorso del file del documento.
+ * - reportPath: Percorso del file del report generato.
+ */
 class Document extends Model<DocumentAttributes, DocumentCreationAttributes> implements DocumentAttributes {
   declare id: number;
   declare userId: number;

@@ -1,6 +1,9 @@
 import { Client } from 'minio';
 
-// Pattern Singleton che garantisce un'unica connessione a MinIO
+/**
+ * Classe singleton per la gestione della connessione a MinIO.
+ * Garantisce un'unica istanza del client MinIO e la creazione dei bucket necessari.
+ */
 class MinioStorage {
   private static instance: Client;
   static readonly DOCUMENTS_BUCKET = process.env.MINIO_DOCUMENTS_BUCKET || 'compliance-documents';
