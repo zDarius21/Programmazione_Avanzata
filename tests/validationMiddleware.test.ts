@@ -90,8 +90,8 @@ describe('validate', () => {
   });
 
   describe('body (createUserSchema)', () => {
-    it('chiama next() con email valida e password >= 8 caratteri', () => {
-      const req = mockReq({ body: { email: 'nuovo@test.it', password: 'password1' } });
+    it('chiama next() con email valida e password forte', () => {
+      const req = mockReq({ body: { email: 'nuovo@test.it', password: 'Password1!' } });
       const res = mockRes();
       const next = mockNext();
 
@@ -114,6 +114,17 @@ describe('validate', () => {
 
     it('risponde con errore di validazione per password troppo corta', () => {
       const req = mockReq({ body: { email: 'nuovo@test.it', password: '123' } });
+      const res = mockRes();
+      const next = mockNext();
+
+      validate({ body: createUserSchema })(req, res, next);
+
+      expect(sendValidationError).toHaveBeenCalledTimes(1);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('risponde con errore di validazione per password senza complessità (no maiuscola/speciale)', () => {
+      const req = mockReq({ body: { email: 'nuovo@test.it', password: 'password123' } });
       const res = mockRes();
       const next = mockNext();
 
