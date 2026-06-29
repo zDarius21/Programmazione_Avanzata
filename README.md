@@ -35,7 +35,7 @@ Le operazioni principali sono:
 
 Il diagramma mostra i tre attori del sistema e le operazioni che ciascuno può compiere. L'**Admin** eredita tutti i casi d'uso dell'**Utente autenticato** e ha accesso esclusivo alle operazioni di gestione.
 
-![Diagramma dei Casi d'Uso](mermaid/casiDuso/use_case_diagram.svg)
+![Diagramma dei Casi d'Uso](res/use_case_diagram.svg)
 
 ## Rotte Disponibili
 
