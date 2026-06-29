@@ -1341,6 +1341,7 @@ I risultati dei test sono mostrati nella seguente figura:
   <img src="res/test_jest.png" alt="Risultato test jest">
 </p>
 
+Per effettuare le operazioni di POST di documenti o normative, utilizzare i file PDF presenti nella cartella `res/`, denominati rispettivamente `Documento_Test.pdf` e `Normativa_Test.pdf`.
 
 ## Note
 
