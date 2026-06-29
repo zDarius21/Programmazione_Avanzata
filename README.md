@@ -1364,8 +1364,11 @@ I risultati dei test sono mostrati nella seguente figura:
 - **pg / pg-hstore** - Driver PostgreSQL per Sequelize
 - **express-async-errors** - Gestione errori asincroni in Express
 - **ts-node-dev** - Ambiente di sviluppo con reload automatico
+- **jest** - Sistema di testing automatizzato
+
+
 
 
 ## Autore
 * Dario Tommasi ([Github](https://github.com/zDarius))
-* Bargilli Andrea ([Github](https://github.com/Bargi20))
+* Andrea Bargilli ([Github](https://github.com/Bargi20))
