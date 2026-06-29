@@ -1331,12 +1331,15 @@ Il servizio è disponibile sulla porta **3000** tramite cURL o Postman.
 ## Testing
 Importare la collection Postman fornita `postman_collection.json`  e l'environment fornito `postman_environment.json` per eseguire i test predefiniti su tutti gli endpoint. I token JWT sono firmati con chiave RS256. Inoltre, sono stati utilizzati dei test automatizzati tramite jest.
 I test tramite jest possono essere eseguiti tramite il seguente comando:
+
 ```bash
 $ docker compose exec app npm test
 ```
 I risultati dei test sono mostrati nella seguente figura:
 
-![Risultato test jest](res/test_jest.png)
+<p align="center">
+  <img src="res/test_jest.png" alt="Risultato test jest">
+</p>
 
 
 ## Note

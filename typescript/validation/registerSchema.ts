@@ -2,7 +2,10 @@ import { z } from 'zod';
 import * as V from '../factory/errorMessages';
 
 const SPECIAL_CHAR_REGEX = /[!@#$%^&*()\-_=+[\]{};':",.<>/?\\|`~]/;
-
+/**
+ * Body della registrazione (`POST /auth/register`): email valida + password >= 8 caratteri.
+ * Il ruolo non è accettato dal client: la registrazione pubblica crea sempre un utente `Role.User`.
+ */
 export const registerSchema = z.object({
   email: z
     .string({ required_error: V.VAL_EMAIL_REQUIRED })

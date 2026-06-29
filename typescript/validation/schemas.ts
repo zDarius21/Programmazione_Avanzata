@@ -47,14 +47,6 @@ export const loginSchema = z.object({
   password: z.string().min(1, Messages.VAL_PASSWORD_REQUIRED),
 });
 
-/**
- * Body della registrazione (`POST /auth/register`): email valida + password >= 8 caratteri.
- * Il ruolo non è accettato dal client: la registrazione pubblica crea sempre un utente `Role.User`.
- */
-export const registerSchema = z.object({
-  email,
-  password,
-});
 
 /**
  * Body dell'aggiornamento del proprio profilo (`PATCH /auth/me`).
