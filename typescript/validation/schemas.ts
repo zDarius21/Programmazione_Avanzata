@@ -24,18 +24,40 @@ export const idParamSchema = z.object({
   id: z.string().regex(/^\d+$/, Messages.VAL_ID_INVALID),
 });
 
-/**
- * Validatore email riutilizzabile: stringa in formato email valido.
- */
-const email = z.string().email(Messages.VAL_EMAIL_INVALID);
+// Caratteri speciali ammessi per la complessità della password
+const SPECIAL_CHAR_REGEX = /[!@#$%^&*()\-_=+[\]{};':",.<>/?\\|`~]/;
 
 /**
- * Validatore password riutilizzabile: stringa di almeno 8 caratteri.
- * Usato in creazione/aggiornamento, non nel login (vedi loginSchema).
+ * Validatore email riutilizzabile: stringa non vuota, trimmata, in formato email valido.
  */
-const password = z.string().min(8, Messages.VAL_PASSWORD_MIN);
+const email = z
+  .string({ required_error: Messages.VAL_EMAIL_REQUIRED })
+  .trim()
+  .email(Messages.VAL_EMAIL_INVALID);
+
+/**
+ * Validatore password riutilizzabile con regole forti: almeno 8 caratteri, senza spazi,
+ * con almeno una maiuscola, una minuscola, una cifra e un carattere speciale.
+ * Stesse regole per registrazione, creazione utente e aggiornamenti.
+ * NON usato nel login (vedi loginSchema), dove serve solo confrontare con l'hash esistente.
+ */
+const password = z
+  .string({ required_error: Messages.VAL_PASSWORD_REQUIRED })
+  .trim()
+  .regex(/^\S+$/, Messages.VAL_PASSWORD_NO_SPACES)
+  .min(8, Messages.VAL_PASSWORD_MIN)
+  .regex(/[A-Z]/, Messages.VAL_PASSWORD_UPPERCASE)
+  .regex(/[a-z]/, Messages.VAL_PASSWORD_LOWERCASE)
+  .regex(/\d/, Messages.VAL_PASSWORD_NUMBER)
+  .regex(SPECIAL_CHAR_REGEX, Messages.VAL_PASSWORD_SPECIAL);
 
 /* ----------------------------- AUTH ----------------------------- */
+
+/**
+ * Body della registrazione (`POST /auth/register`): email valida + password forte.
+ * Il ruolo non è accettato dal client: la registrazione pubblica crea sempre `Role.User`.
+ */
+export const registerSchema = z.object({ email, password });
 
 /**
  * Body del login (`POST /auth/login`): email valida + password presente.

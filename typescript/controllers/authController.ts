@@ -6,7 +6,6 @@ import User from '../models/User';
 import UserDAO from '../dao/UserDAO';
 import ResponseFactory, { ErrorEnum, SuccessEnum } from '../factory/responseFactory';
 import { Role } from '../enums/role';
-import { registerSchema } from '../validation/registerSchema';
 
 // La chiave privata letta dal file indicato nel .env
 const PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_PATH ?? '', 'utf8');
@@ -19,13 +18,8 @@ const JWT_EXPIRY = (process.env.JWT_EXPIRES_IN ?? '1h') as jwt.SignOptions['expi
  * @returns Nessun valore restituito direttamente, invia la risposta tramite ResponseFactory
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
-  const result = registerSchema.safeParse(req.body);
-  if (!result.success) {
-    ResponseFactory.sendValidationError(res, result.error);
-    return;
-  }
-
-  const { email, password } = result.data;
+  // Il body è già validato dal middleware validate(registerSchema) nella rotta
+  const { email, password } = req.body;
 
   // Controlliamo che l'email non sia già in uso
   const existing = await User.findOne({ where: { email } });
