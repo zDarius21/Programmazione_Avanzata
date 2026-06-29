@@ -66,8 +66,8 @@ Registra un nuovo utente nel sistema assegnandogli automaticamente il ruolo `use
 > La password deve contenere almeno 8 caratteri.
 
 **Errori possibili:**
-- `400 Bad Request` — email non valida o password troppo corta
-- `409 Conflict` — email già registrata
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_EMAIL_ALREADY_REGISTERED` — Email già registrata
 
 **Successo:** `201 Created` — Ritorna il token JWT e il ruolo `user`
 
@@ -89,7 +89,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Validate: Valida body (email valida,<br/>password >= 8 caratteri)
         alt email non valida o password troppo corta
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
 
@@ -102,7 +102,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt email gia registrata
-            Controller-->>Client: 409 Conflict<br/>{ error: "Email gia registrata" }
+            Controller-->>Client: ERR_EMAIL_ALREADY_REGISTERED<br/>{ error: "Email già registrata" }
         end
     end
 
@@ -140,8 +140,8 @@ Verifica le credenziali dell'utente e, se corrette, restituisce un token JWT fir
 ```
 
 **Errori possibili:**
-- `400 Bad Request` — email non valida o password mancante
-- `401 Unauthorized` — credenziali errate (utente non trovato o password sbagliata)
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_INVALID_CREDENTIALS` — Credenziali non valide
 
 **Successo:** `200 OK` — Ritorna il token JWT e il ruolo dell'utente
 
@@ -163,7 +163,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Validate: Valida body (email valida,<br/>password non vuota)
         alt email non valida o password mancante
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
 
@@ -176,7 +176,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt utente non trovato
-            Controller-->>Client: 401 Unauthorized<br/>{ error: "Credenziali non valide" }
+            Controller-->>Client: ERR_INVALID_CREDENTIALS<br/>{ error: "Credenziali non valide" }
         end
     end
 
@@ -185,7 +185,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt password errata
-            Controller-->>Client: 401 Unauthorized<br/>{ error: "Credenziali non valide" }
+            Controller-->>Client: ERR_INVALID_CREDENTIALS<br/>{ error: "Credenziali non valide" }
         end
     end
 
@@ -208,7 +208,9 @@ Restituisce le informazioni del profilo dell'utente autenticato (email, ruolo, t
 
 
 **Errori possibili:**
-- `401 Unauthorized` — token mancante o non valido
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_USER_NOT_FOUND` — Utente non trovato
 
 **Successo:** `200 OK` — Ritorna `{ id, email, role, tokens }`
 
@@ -228,9 +230,11 @@ Permette all'utente autenticato di aggiornare il proprio profilo (email e/o pass
 ```
 
 **Errori possibili:**
-- `400 Bad Request` — body vuoto o dati non validi
-- `401 Unauthorized` — token mancante o non valido
-- `409 Conflict` — email già in uso da un altro utente
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_USER_NOT_FOUND` — Utente non trovato
+- `ERR_EMAIL_IN_USE` — Email già in uso
 
 **Successo:** `200 OK` — Ritorna i dati aggiornati dell'utente
 
@@ -259,8 +263,9 @@ Restituisce la lista completa di tutti gli utenti registrati nel sistema. Access
 
 
 **Errori possibili:**
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
 
 **Successo:** `200 OK` — Ritorna un array di `{ id, email, role, tokens }`
 
@@ -276,10 +281,11 @@ Restituisce i dati di un singolo utente dato il suo `id`. Accessibile solo agli 
 - `id` — intero positivo, identificatore dell'utente
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
-- `404 Not Found` — utente non trovato
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_USER_NOT_FOUND` — Utente non trovato
 
 **Successo:** `200 OK` — Ritorna `{ id, email, role, tokens }`
 
@@ -299,10 +305,11 @@ Crea un nuovo utente nel sistema. Operazione riservata agli amministratori. Il r
 ```
 
 **Errori possibili:**
-- `400 Bad Request` — email non valida o password troppo corta (< 8 caratteri)
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
-- `409 Conflict` — email già in uso
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_EMAIL_ALREADY_USED` — Email già utilizzata
 
 **Successo:** `201 Created` — Ritorna `{ id, email, role: "user" }`
 
@@ -324,19 +331,19 @@ sequenceDiagram
         note over Auth,Validate: Chain of Responsibility (middleware)
         Router->>+Auth: authenticate(req, res, next)
         alt token mancante o non valido
-            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+            Auth-->>Client: ERR_TOKEN_MISSING / ERR_TOKEN_INVALID<br/>{ error: "Token mancante / non valido o scaduto" }
         end
         Auth-->>-Router: req.user
 
         Router->>+Role: requireAdmin(req, res, next)
         alt ruolo != Role.Admin
-            Role-->>Client: 403 Forbidden<br/>{ error: "Accesso riservato agli admin" }
+            Role-->>Client: ERR_FORBIDDEN<br/>{ error: "Accesso riservato agli admin" }
         end
         Role-->>-Router: next()
 
         Router->>+Validate: validate({ body: createUserSchema })
         alt email non valida o password < 8 caratteri
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
         Validate-->>-Router: next()
     end
@@ -350,7 +357,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt email gia in uso
-            Controller-->>Client: 409 Conflict<br/>{ error: "Email gia utilizzata" }
+            Controller-->>Client: ERR_EMAIL_ALREADY_USED<br/>{ error: "Email già utilizzata" }
         end
     end
 
@@ -387,11 +394,12 @@ Aggiorna i dati di un utente esistente (email, password, ruolo). Operazione rise
 ```
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido, body vuoto o ruolo non riconosciuto
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
-- `404 Not Found` — utente non trovato
-- `409 Conflict` — email già in uso da un altro utente
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_USER_NOT_FOUND` — Utente non trovato
+- `ERR_EMAIL_IN_USE` — Email già in uso
 
 **Successo:** `200 OK` — Ritorna `{ id, email, role }`
 
@@ -413,19 +421,19 @@ sequenceDiagram
         note over Auth,Validate: Chain of Responsibility (middleware)
         Router->>+Auth: authenticate(req, res, next)
         alt token mancante o non valido
-            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+            Auth-->>Client: ERR_TOKEN_MISSING / ERR_TOKEN_INVALID<br/>{ error: "Token mancante / non valido o scaduto" }
         end
         Auth-->>-Router: req.user
 
         Router->>+Role: requireAdmin(req, res, next)
         alt ruolo != Role.Admin
-            Role-->>Client: 403 Forbidden<br/>{ error: "Accesso riservato agli admin" }
+            Role-->>Client: ERR_FORBIDDEN<br/>{ error: "Accesso riservato agli admin" }
         end
         Role-->>-Router: next()
 
         Router->>+Validate: validate({ params: idParamSchema,<br/>body: updateUserSchema })
         alt id non intero, body vuoto o role non valido
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
         Validate-->>-Router: next()
     end
@@ -439,7 +447,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt utente non trovato
-            Controller-->>Client: 404 Not Found<br/>{ error: "Utente non trovato" }
+            Controller-->>Client: ERR_USER_NOT_FOUND<br/>{ error: "Utente non trovato" }
         end
     end
 
@@ -451,7 +459,7 @@ sequenceDiagram
             DB-->>-DAO: User | null
             DAO-->>-Controller: User | null
             alt email gia in uso da altro utente
-                Controller-->>Client: 409 Conflict<br/>{ error: "Email gia in uso" }
+                Controller-->>Client: ERR_EMAIL_IN_USE<br/>{ error: "Email già in uso" }
             end
             Controller->>Controller: user.email = email
         end
@@ -488,10 +496,11 @@ Elimina definitivamente un utente dal sistema. Operazione riservata agli amminis
 - `id` — intero positivo, identificatore dell'utente
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
-- `404 Not Found` — utente non trovato
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_USER_NOT_FOUND` — Utente non trovato
 
 **Successo:** `200 OK` — Conferma dell'eliminazione
 
@@ -503,7 +512,9 @@ Restituisce il numero di token rimanenti dell'utente autenticato.
 
 
 **Errori possibili:**
-- `401 Unauthorized` — token mancante o non valido
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_USER_NOT_FOUND` — Utente non trovato
 
 **Successo:** `200 OK` — Ritorna `{ tokens: <numero> }`
 
@@ -525,10 +536,12 @@ Aggiunge token all'account di un utente specifico. Operazione riservata agli amm
 ```
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido o quantità non positiva
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
-- `404 Not Found` — utente non trovato
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_USER_NOT_FOUND` — Utente non trovato
+- `ERR_TOKEN_CAP_EXCEEDED` — La ricarica supera il massimo consentito di 100 token
 
 **Successo:** `200 OK` — Ritorna i token aggiornati dell'utente
 
@@ -554,7 +567,8 @@ Restituisce la lista completa di tutte le normative presenti nel catalogo.
 
 
 **Errori possibili:**
-- `401 Unauthorized` — token mancante o non valido
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
 
 **Successo:** `200 OK` — Ritorna un array di `{ id, name, version, description }`
 
@@ -570,9 +584,10 @@ Restituisce i dettagli di una singola normativa dato il suo `id`.
 - `id` — intero positivo, identificatore della normativa
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `404 Not Found` — normativa non trovata
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_REGULATION_NOT_FOUND` — Normativa non trovata
 
 **Successo:** `200 OK` — Ritorna `{ id, name, version, description }`
 
@@ -593,10 +608,13 @@ file        → (opzionale) file PDF da cui estrarre la descrizione
 > Se non viene allegato un PDF, il campo `description` deve essere incluso nel body.
 
 **Errori possibili:**
-- `400 Bad Request` — nome o versione mancanti, file non PDF o descrizione assente
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
-- `409 Conflict` — normativa con lo stesso nome già esistente
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
+- `ERR_INVALID_FILE_TYPE` — Solo file PDF sono accettati
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_REGULATION_FIELDS_REQUIRED` — name, description e version sono obbligatori
+- `ERR_REGULATION_ALREADY_EXISTS` — Normativa già esistente
 
 **Successo:** `201 Created` — Ritorna `{ id, name, version, description }`
 
@@ -620,25 +638,25 @@ sequenceDiagram
         note over Auth,Validate: Chain of Responsibility (middleware)
         Router->>+Auth: authenticate(req, res, next)
         alt token mancante o non valido
-            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+            Auth-->>Client: ERR_TOKEN_MISSING / ERR_TOKEN_INVALID<br/>{ error: "Token mancante / non valido o scaduto" }
         end
         Auth-->>-Router: req.user
 
         Router->>+Role: requireAdmin(req, res, next)
         alt ruolo != Role.Admin
-            Role-->>Client: 403 Forbidden<br/>{ error: "Accesso riservato agli admin" }
+            Role-->>Client: ERR_FORBIDDEN<br/>{ error: "Accesso riservato agli admin" }
         end
         Role-->>-Router: next()
 
         Router->>+Upload: uploadPdf(req, res, next)
         alt file non PDF o > 10MB
-            Upload-->>Client: 400 Bad Request<br/>{ error: "Tipo di file non valido" }
+            Upload-->>Client: ERR_INVALID_FILE_TYPE<br/>{ error: "Solo file PDF sono accettati" }
         end
         Upload-->>-Router: req.file (buffer in RAM)
 
         Router->>+Validate: validate({ body: createRegulationSchema })
         alt name o version mancanti
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
         Validate-->>-Router: next()
     end
@@ -656,7 +674,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Controller: description obbligatoria (dal body o dal PDF)
         alt description mancante
-            Controller-->>Client: 400 Bad Request<br/>{ error: "Campi normativa richiesti" }
+            Controller-->>Client: ERR_REGULATION_FIELDS_REQUIRED<br/>{ error: "name, description e version sono obbligatori" }
         end
     end
 
@@ -667,7 +685,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt normativa gia esistente
-            Controller-->>Client: 409 Conflict<br/>{ error: "Normativa gia esistente" }
+            Controller-->>Client: ERR_REGULATION_ALREADY_EXISTS<br/>{ error: "Normativa già esistente" }
         end
     end
 
@@ -703,10 +721,11 @@ Aggiorna i campi di una normativa esistente (nome, descrizione, versione). Opera
 ```
 
 **Errori possibili:**
-- `400 Bad Request` — id non intero o body vuoto
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
-- `404 Not Found` — normativa non trovata
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_REGULATION_NOT_FOUND` — Normativa non trovata
 
 **Successo:** `200 OK` — Ritorna la normativa aggiornata
 
@@ -729,7 +748,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Auth: Verifica JWT
         alt token mancante o non valido
-            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+            Auth-->>Client: ERR_TOKEN_MISSING / ERR_TOKEN_INVALID<br/>{ error: "Token mancante / non valido o scaduto" }
         end
     end
 
@@ -737,7 +756,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt ruolo != Role.Admin
-            Role-->>Client: 403 Forbidden<br/>{ error: "Accesso negato" }
+            Role-->>Client: ERR_FORBIDDEN<br/>{ error: "Accesso riservato agli admin" }
         end
     end
 
@@ -746,7 +765,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Validate: Valida :id (intero) e body<br/>(almeno un campo, non vuoti)
         alt id non intero o body vuoto
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
 
@@ -759,7 +778,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt normativa non trovata
-            Controller-->>Client: 404 Not Found<br/>{ error: "Normativa non trovata" }
+            Controller-->>Client: ERR_REGULATION_NOT_FOUND<br/>{ error: "Normativa non trovata" }
         end
     end
 
@@ -790,10 +809,11 @@ Elimina definitivamente una normativa dal catalogo. Operazione riservata agli am
 - `id` — intero positivo, identificatore della normativa
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `403 Forbidden` — l'utente non ha il ruolo admin
-- `404 Not Found` — normativa non trovata
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_FORBIDDEN` — Accesso riservato agli admin
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_REGULATION_NOT_FOUND` — Normativa non trovata
 
 **Successo:** `200 OK` — Conferma dell'eliminazione
 
@@ -822,7 +842,8 @@ Restituisce la lista di tutti i documenti caricati dall'utente autenticato.
 
 
 **Errori possibili:**
-- `401 Unauthorized` — token mancante o non valido
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
 
 **Successo:** `200 OK` — Ritorna un array di `{ id, title, description, status, createdAt }`
 
@@ -838,9 +859,10 @@ Restituisce i dettagli di un singolo documento dell'utente autenticato.
 - `id` — intero positivo, identificatore del documento
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `404 Not Found` — documento non trovato o non appartenente all'utente
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_DOCUMENT_NOT_FOUND` — Documento non trovato
 
 **Successo:** `200 OK` — Ritorna `{ id, title, description, status, filePath, createdAt }`
 
@@ -856,9 +878,12 @@ Scarica il file PDF originale associato a un documento dell'utente. Il file vien
 - `id` — intero positivo, identificatore del documento
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `404 Not Found` — documento non trovato o file non disponibile
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_DOCUMENT_NOT_FOUND` — Documento non trovato
+- `ERR_FILE_NOT_AVAILABLE` — Il file originale non è disponibile per questo documento
+- `ERR_STORAGE_ERROR` — Errore durante l'operazione sul file storage
 
 **Successo:** `200 OK` — Ritorna il file PDF con `Content-Type: application/pdf`
 
@@ -878,9 +903,12 @@ file        → file PDF (max 10 MB)
 ```
 
 **Errori possibili:**
-- `400 Bad Request` — titolo/descrizione mancanti o file non PDF/assente
-- `401 Unauthorized` — token mancante o non valido
-- `503 Service Unavailable` — errore durante l'upload su MinIO
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_INVALID_FILE_TYPE` — Solo file PDF sono accettati
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_FILE_REQUIRED` — Il file PDF è obbligatorio
+- `ERR_STORAGE_ERROR` — Errore durante l'operazione sul file storage
 
 **Successo:** `201 Created` — Ritorna i metadati del documento creato
 
@@ -904,7 +932,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Auth: Verifica JWT
         alt token mancante o non valido
-            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+            Auth-->>Client: ERR_TOKEN_MISSING / ERR_TOKEN_INVALID<br/>{ error: "Token mancante / non valido o scaduto" }
         end
     end
 
@@ -913,7 +941,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Upload: Validazione file (max 10MB)
         alt file non PDF
-            Upload-->>Client: 400 Bad Request<br/>{ error: "Tipo file non valido" }
+            Upload-->>Client: ERR_INVALID_FILE_TYPE<br/>{ error: "Solo file PDF sono accettati" }
         end
     end
 
@@ -922,7 +950,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Validate: Valida body (title, description<br/>stringhe non vuote)
         alt title o description mancanti/vuoti
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
 
@@ -930,7 +958,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt file assente (req.file)
-            Controller-->>Client: 400 Bad Request<br/>{ error: "File obbligatorio" }
+            Controller-->>Client: ERR_FILE_REQUIRED<br/>{ error: "Il file PDF è obbligatorio" }
         end
     end
 
@@ -956,7 +984,7 @@ sequenceDiagram
             note over Controller,Minio: ROLLBACK automatico (INSERT annullato)<br/>+ rimozione file orfano se già caricato
             Controller->>+Minio: removeObject(DOCUMENTS_BUCKET, fileKey)
             Minio-->>-Controller: ok
-            Controller-->>Client: 503 Service Unavailable<br/>{ error: "Errore storage" }
+            Controller-->>Client: ERR_STORAGE_ERROR<br/>{ error: "Errore durante l'operazione sul file storage" }
         end
     end
 
@@ -987,9 +1015,10 @@ Aggiorna i metadati (titolo e/o descrizione) di un documento esistente dell'uten
 ```
 
 **Errori possibili:**
-- `400 Bad Request` — id non intero o body vuoto/non valido
-- `401 Unauthorized` — token mancante o non valido
-- `404 Not Found` — documento non trovato o non appartenente all'utente
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_DOCUMENT_NOT_FOUND` — Documento non trovato
 
 **Successo:** `200 OK` — Ritorna il documento aggiornato
 
@@ -1011,7 +1040,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Auth: Verifica JWT
         alt token mancante o non valido
-            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+            Auth-->>Client: ERR_TOKEN_MISSING / ERR_TOKEN_INVALID<br/>{ error: "Token mancante / non valido o scaduto" }
         end
     end
 
@@ -1020,7 +1049,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Validate: Valida :id (intero) e body<br/>(title?/description?, almeno uno)
         alt dati non validi
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
 
@@ -1033,7 +1062,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt documento non trovato
-            Controller-->>Client: 404 Not Found<br/>{ error: "Documento non trovato" }
+            Controller-->>Client: ERR_DOCUMENT_NOT_FOUND<br/>{ error: "Documento non trovato" }
         end
     end
 
@@ -1063,9 +1092,10 @@ Elimina un documento dell'utente autenticato. Il documento deve appartenere all'
 - `id` — intero positivo, identificatore del documento
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `404 Not Found` — documento non trovato o non appartenente all'utente
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_DOCUMENT_NOT_FOUND` — Documento non trovato
 
 **Successo:** `200 OK` — Conferma dell'eliminazione
 
@@ -1081,13 +1111,14 @@ Avvia l'analisi di conformità ESG su un documento. Il sistema genera un report 
 - `id` — intero positivo, identificatore del documento
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `402 Payment Required` — token insufficienti (< 10)
-- `404 Not Found` — documento non trovato o non appartenente all'utente
-- `409 Conflict` — documento già analizzato
-- `503 Service Unavailable` — errore nella generazione del PDF o upload MinIO
-- `500 Internal Server Error` — errore durante la transazione DB (con cleanup del file su MinIO)
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_DOCUMENT_NOT_FOUND` — Documento non trovato
+- `ERR_DOCUMENT_ALREADY_ANALYZED` — Il documento è già stato analizzato
+- `ERR_INSUFFICIENT_TOKENS` — Token insufficienti per eseguire l'analisi
+- `ERR_STORAGE_ERROR` — Errore durante l'operazione sul file storage
+- `ERR_DATABASE_ERROR` — Errore durante l'operazione sul database
 
 **Successo:** `200 OK` — Ritorna `{ document, reportId, tokensRemaining }`
 
@@ -1112,7 +1143,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Auth: Verifica JWT
         alt token mancante o non valido
-            Auth-->>Client: 401 Unauthorized<br/>{ error: "Token non valido" }
+            Auth-->>Client: ERR_TOKEN_MISSING / ERR_TOKEN_INVALID<br/>{ error: "Token mancante / non valido o scaduto" }
         end
     end
 
@@ -1121,7 +1152,7 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         note over Validate: Valida :id (intero positivo)
         alt id non valido
-            Validate-->>Client: 400 Bad Request<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
+            Validate-->>Client: ERR_VALIDATION<br/>{ error: "Dati della richiesta non validi",<br/>details: [...] }
         end
     end
 
@@ -1134,13 +1165,13 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt documento non trovato
-            Controller-->>Client: 404 Not Found<br/>{ error: "Documento non trovato" }
+            Controller-->>Client: ERR_DOCUMENT_NOT_FOUND<br/>{ error: "Documento non trovato" }
         end
     end
 
     rect rgb(255, 240, 240)
         alt document.status === "analyzed"
-            Controller-->>Client: 409 Conflict<br/>{ error: "Documento già analizzato" }
+            Controller-->>Client: ERR_DOCUMENT_ALREADY_ANALYZED<br/>{ error: "Il documento è già stato analizzato" }
         end
     end
 
@@ -1151,7 +1182,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt utente non trovato o tokens < ANALYSIS_TOKEN_COST (10)
-            Controller-->>Client: 402 Payment Required<br/>{ error: "Token insufficienti" }
+            Controller-->>Client: ERR_INSUFFICIENT_TOKENS<br/>{ error: "Token insufficienti per eseguire l'analisi" }
         end
     end
 
@@ -1165,7 +1196,7 @@ sequenceDiagram
 
     rect rgb(255, 240, 240)
         alt errore generazione PDF o upload MinIO
-            Controller-->>Client: 503 Service Unavailable<br/>{ error: "Errore storage" }
+            Controller-->>Client: ERR_STORAGE_ERROR<br/>{ error: "Errore durante l'operazione sul file storage" }
         end
     end
 
@@ -1191,7 +1222,7 @@ sequenceDiagram
             note over Controller,Minio: ROLLBACK + cleanup file orfano
             Controller->>+Minio: removeObject(REPORTS_BUCKET, reportKey)
             Minio-->>-Controller: ok
-            Controller-->>Client: 500 Internal Server Error<br/>{ error: "Errore database" }
+            Controller-->>Client: ERR_DATABASE_ERROR<br/>{ error: "Errore durante l'operazione sul database" }
         end
     end
 
@@ -1221,7 +1252,8 @@ Restituisce la lista di tutte le analisi effettuate dall'utente autenticato, ord
 
 
 **Errori possibili:**
-- `401 Unauthorized` — token mancante o non valido
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
 
 **Successo:** `200 OK` — Ritorna un array di `{ id, documentId, createdAt, complianceResults }`
 
@@ -1237,9 +1269,10 @@ Restituisce i dettagli completi di una singola analisi, inclusi tutti i `Complia
 - `id` — intero positivo, identificatore dell'analisi
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `404 Not Found` — analisi non trovata o non appartenente all'utente
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_ANALYSIS_NOT_FOUND` — Analisi non trovata
 
 **Successo:** `200 OK` — Ritorna `{ id, documentId, createdAt, complianceResults: [...] }`
 
@@ -1264,9 +1297,11 @@ Scarica il report PDF generato in seguito all'analisi di conformità ESG di un d
 - `id` — intero positivo, identificatore del report
 
 **Errori possibili:**
-- `400 Bad Request` — id non valido
-- `401 Unauthorized` — token mancante o non valido
-- `404 Not Found` — report non trovato o non appartenente all'utente
+- `ERR_TOKEN_MISSING` — Token mancante
+- `ERR_TOKEN_INVALID` — Token non valido o scaduto
+- `ERR_VALIDATION` — Dati della richiesta non validi
+- `ERR_REPORT_NOT_FOUND` — Report non trovato
+- `ERR_STORAGE_ERROR` — Errore durante l'operazione sul file storage
 
 **Successo:** `200 OK` — Ritorna il file PDF con `Content-Type: application/pdf`
 
