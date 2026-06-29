@@ -1309,15 +1309,20 @@ Scarica il report PDF generato in seguito all'analisi di conformità ESG di un d
 
 ## Design Pattern Implementati
 
-**Singleton** gestisce la connessione al database garantendo un'unica istanza condivisa lungo tutto il ciclo di vita dell'applicazione.
+**Singleton** — gestisce la connessione al database ([database.ts](typescript/singleton/database.ts)) e il client MinIO ([minio.ts](typescript/singleton/minio.ts)) garantendo un'unica istanza condivisa lungo tutto il ciclo di vita dell'applicazione.
+*Perché:* aprire una nuova connessione/client a ogni richiesta sprecherebbe risorse e potrebbe esaurire il pool del DB; un'unica istanza centralizza la configurazione (un solo punto da modificare) e assicura che tutto il codice lavori sulla stessa connessione.
 
-**Factory** crea oggetti di risposta standardizzati (successo/errore) con HTTP status code e messaggi coerenti in tutti gli endpoint.
+**Factory** — crea oggetti di risposta standardizzati di successo/errore con HTTP status code e messaggi coerenti ([responseFactory.ts](typescript/factory/responseFactory.ts), [error.ts](typescript/factory/error.ts)).
+*Perché:* disaccoppia i controller dalla forma della risposta: aggiungere o modificare un errore significa toccare una sola classe/enum, non tutti gli endpoint, garantendo messaggi e status uniformi su tutta l'API.
 
-**Chain of Responsibility** filtra le richieste attraverso livelli middleware: validazione JWT → verifica ruolo (admin/user) → logica di business → gestione errori.
+**Chain of Responsibility** — filtra le richieste attraverso una catena di middleware: autenticazione JWT → verifica ruolo → validazione (Zod) → logica di business → gestione errori centralizzata.
+*Perché:* ogni middleware ha una singola responsabilità ed è componibile e riordinabile per rotta; la richiesta viene interrotta al primo controllo fallito, così i controller restano puliti e non devono conoscere i dettagli di auth e validazione.
 
-**Model-View-Controller** gestisce in maniera strutturata le richieste, tramite la divisione degli incarichi tra i vari elementi.
+**Data Access Object (DAO)** — isola l'accesso ai dati nei [dao/](typescript/dao/), incapsulando le query Sequelize dietro un'interfaccia comune ([IDao.ts](typescript/dao/IDao.ts)).
+*Perché:* la logica di business non dipende dai dettagli del DB, le query (e accorgimenti come i `SAFE_ATTRIBUTES` sugli utenti) sono centralizzate e riusabili, e nei test i DAO si possono mockare facilmente senza un database reale.
 
-**Data Access Object** fornisce un'astrazione per l'accesso ai dati del database.
+**Model-View-Controller (MVC)** — separa rotte, controller e modelli Sequelize, dividendo gli incarichi tra i vari elementi.
+*Perché:* la separazione delle responsabilità rende il codice più leggibile, testabile e manutenibile, permettendo di modificare un livello (es. la persistenza) senza impattare gli altri.
 
 ## Avvio del Servizio
 Requisiti: Docker installato
