@@ -2,7 +2,7 @@
 import * as ErrorMessages from './errorMessages';
 
 // Interfaccia delle classi "error"
-interface ErrorObj {
+export interface ErrorObj {
   getErrorObj(): { status: number; message: string };
 }
 

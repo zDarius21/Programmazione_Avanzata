@@ -1,5 +1,5 @@
 // Interfaccia delle classi "success"
-interface SuccessObj {
+export interface SuccessObj {
   getSuccessObj(): { status: number };
 }
 

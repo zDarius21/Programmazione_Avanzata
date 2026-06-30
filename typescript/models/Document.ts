@@ -3,7 +3,7 @@ import Database from '../singleton/database';
 import { DocumentStatus } from '../enums/documentStatus';
 
 // Attributi completi di un documento
-interface DocumentAttributes {
+export interface DocumentAttributes {
   id: number;
   userId: number;
   title: string;
@@ -15,7 +15,7 @@ interface DocumentAttributes {
 
 // In fase di creazione: id è auto-generato, status ha default 'pending', i path sono opzionali
 
-interface DocumentCreationAttributes extends Optional<DocumentAttributes, 'id' | 'status' | 'filePath' | 'reportPath'> {}
+export interface DocumentCreationAttributes extends Optional<DocumentAttributes, 'id' | 'status' | 'filePath' | 'reportPath'> {}
 /**
  * Rappresenta un documento caricato nel sistema. Estende il modello Sequelize per interagire con la tabella 'documents' nel database.
  * Contiene informazioni sul documento, come titolo, descrizione, stato e percorsi dei file.

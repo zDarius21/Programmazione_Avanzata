@@ -3,10 +3,10 @@ import Report from '../models/Report';
 import { IDao } from './IDao';
 import { AppError, ErrorEnum } from '../factory/error';
 
-type ReportCreateData = { documentId: number; userId: number; filePath: string };
+export type ReportCreateData = { documentId: number; userId: number; filePath: string };
 
 // DAO per le operazioni di accesso ai dati dei report
-class ReportDAO implements IDao<Report, ReportCreateData> {
+export class ReportDAO implements IDao<Report, ReportCreateData> {
 
   /** 
    * Funzione di Ricerca di tutti i report presenti nel database.

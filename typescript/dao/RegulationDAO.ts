@@ -2,10 +2,10 @@ import Regulation from '../models/Regulation';
 import { IDao } from './IDao';
 import { AppError, ErrorEnum } from '../factory/error';
 
-type RegulationCreateData = { name: string; description: string; version: string };
+export type RegulationCreateData = { name: string; description: string; version: string };
 
 // DAO per le operazioni di accesso ai dati delle normative
-class RegulationDAO implements IDao<Regulation, RegulationCreateData> {
+export class RegulationDAO implements IDao<Regulation, RegulationCreateData> {
 
   /** 
    * Funzione di Ricerca di tutte le normative presenti nel database.

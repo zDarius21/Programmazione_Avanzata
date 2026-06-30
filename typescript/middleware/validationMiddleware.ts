@@ -5,7 +5,7 @@ import ResponseFactory from '../factory/responseFactory';
 /**
  * Insieme di schemi Zod applicabili alle diverse parti della richiesta.
  */
-interface RequestSchemas {
+export interface RequestSchemas {
   body?: ZodSchema;
   params?: ZodSchema;
   query?: ZodSchema;

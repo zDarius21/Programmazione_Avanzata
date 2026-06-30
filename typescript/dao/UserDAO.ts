@@ -6,10 +6,10 @@ import { Role } from '../enums/role';
 
 const SAFE_ATTRIBUTES = ['id', 'email', 'role', 'tokens', 'createdAt', 'updatedAt'];
 
-type UserCreateData = { email: string; password: string; role: Role };
+export type UserCreateData = { email: string; password: string; role: Role };
 
 // DAO per le operazioni di accesso ai dati degli utenti
-class UserDAO implements IDao<User, UserCreateData> {
+export class UserDAO implements IDao<User, UserCreateData> {
 
   
   /** Restituisce tutti gli utenti senza il campo password.

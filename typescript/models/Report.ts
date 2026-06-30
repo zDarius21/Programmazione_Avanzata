@@ -2,7 +2,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import Database from '../singleton/database';
 
 // Attributi completi di un report
-interface ReportAttributes {
+export interface ReportAttributes {
   id: number;
   documentId: number;
   userId: number;
@@ -10,7 +10,7 @@ interface ReportAttributes {
 }
 
 // In fase di creazione l'id è auto-generato dal database
-interface ReportCreationAttributes extends Optional<ReportAttributes, 'id'> {}
+export interface ReportCreationAttributes extends Optional<ReportAttributes, 'id'> {}
 
 /**
  * Rappresenta un report generato dall'analisi ESG di un documento. Estende il modello Sequelize per interagire con la tabella 'reports' nel database.

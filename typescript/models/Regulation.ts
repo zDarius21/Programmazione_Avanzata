@@ -2,7 +2,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import Database from '../singleton/database';
 
 // Attributi completi di una normativa
-interface RegulationAttributes {
+export interface RegulationAttributes {
   id: number;
   name: string;
   description: string;
@@ -10,7 +10,7 @@ interface RegulationAttributes {
 }
 
 // In fase di creazione l'id è opzionale perché lo genera incrementalmente il database
-interface RegulationCreationAttributes extends Optional<RegulationAttributes, 'id'> {}
+export interface RegulationCreationAttributes extends Optional<RegulationAttributes, 'id'> {}
 /**
  * Rappresenta una normativa del sistema. Estende il modello Sequelize per interagire con la tabella 'regulations' nel database.
  * Contiene informazioni sul nome, la descrizione e la versione della normativa.

@@ -3,7 +3,7 @@ import Database from '../singleton/database';
 import { Role } from '../enums/role';
 
 // Attributi completi di un utente
-interface UserAttributes {
+export interface UserAttributes {
   id: number;
   email: string;
   password: string;
@@ -12,7 +12,7 @@ interface UserAttributes {
 }
 
 // In fase di creazione id e tokens sono opzionali poichè creati automaticamente
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'tokens'> {}
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'tokens'> {}
 
 /**
  * Rappresenta un utente del sistema. Estende il modello Sequelize per interagire con la tabella 'users' nel database.
